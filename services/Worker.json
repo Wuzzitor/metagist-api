@@ -1,12 +1,12 @@
 {
-    "name": "Server",
+    "name": "Worker",
     "apiVersion": "0.1",
-    "description": "Metagist Server Client",
+    "description": "Metagist Worker Client",
     "operations": {
-        "package": {
+        "scan": {
             "httpMethod": "GET",
-            "uri": "package/{author}/{name}",
-            "summary": "Returns info on a package, creates the package if necessary.",
+            "uri": "scan/{author}/{name}",
+            "summary": "Triggers information retrieval from a package.",
             "parameters": {
                 "author": {
                     "description": "Package author/owner name",

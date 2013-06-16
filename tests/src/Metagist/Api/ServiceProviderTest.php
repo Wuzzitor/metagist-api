@@ -48,7 +48,12 @@ class ServiceProviderTest extends \PHPUnit_Framework_TestCase
     public function testApiProvidesServerInterface()
     {
         $this->app[ServiceProvider::APP_SERVICES] = __DIR__ . '/testdata/testservices.json';
-        $this->app[ServiceProvider::APP_SERVER_CONFIG] = array('base_url' => 'http://test.com');
+        $this->app[ServiceProvider::APP_SERVER_CONFIG] = array(
+            'base_url' => 'http://test.com',
+            'description' => realpath(__DIR__ . '/../../../../services/Server.json'),
+            'consumer_key' => 'metagist.org',
+            'consumer_secret' => 'obey'
+        );
         $this->serviceProvider->register($this->app);
         
         $server = $this->serviceProvider->server();
@@ -75,6 +80,7 @@ class ServiceProviderTest extends \PHPUnit_Framework_TestCase
         $this->app[ServiceProvider::APP_SERVICES] = __DIR__ . '/testdata/testservices.json';
         $this->app[ServiceProvider::APP_WORKER_CONFIG] = array(
             'base_url' => 'http://test.com',
+            'description' => realpath(__DIR__ . '/../../../../services/Worker.json'),
             'consumer_key' => 'worker1',
             'consumer_secret' => 'test'
         );
@@ -104,10 +110,26 @@ class ServiceProviderTest extends \PHPUnit_Framework_TestCase
         $this->app[ServiceProvider::APP_SERVICES] = __DIR__ . '/testdata/testservices.json';
         $this->app[ServiceProvider::APP_WORKER_CONFIG] = array(
             'base_url' => 'http://test.com',
+            'description' => realpath(__DIR__ . '/../../../../services/Server.json'),
         );
         $this->serviceProvider->register($this->app);
         
         $this->setExpectedException("\Metagist\Api\Exception", 'OAuth');
+        $this->serviceProvider->worker();
+    }
+    
+    /**
+     * Ensures an exception is thrown if the oauth configuration is missing.
+     */
+    public function testApiNoDescriptionConfigurationException()
+    {
+        $this->app[ServiceProvider::APP_SERVICES] = __DIR__ . '/testdata/testservices.json';
+        $this->app[ServiceProvider::APP_WORKER_CONFIG] = array(
+            'base_url' => 'http://test.com',
+        );
+        $this->serviceProvider->register($this->app);
+        
+        $this->setExpectedException("\Metagist\Api\Exception", 'description');
         $this->serviceProvider->worker();
     }
 }

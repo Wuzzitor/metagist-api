@@ -4,6 +4,7 @@ namespace Metagist\Api;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 use Guzzle\Service\Builder\ServiceBuilder;
+use Guzzle\Service\Description\ServiceDescription;
 
 /**
  * Silex service provider which registers metagist api clients.
@@ -83,6 +84,10 @@ class ServiceProvider implements ServiceProviderInterface
      */
     protected function buildService($name, array $config)
     {
+        if (!array_key_exists('description', $config)) {
+            throw new Exception('Service description not configured', 500);
+        }
+        
         if (!array_key_exists('consumer_key', $config)) {
             throw new Exception('OAuth consumer key not configured', 500);
         }
@@ -93,6 +98,7 @@ class ServiceProvider implements ServiceProviderInterface
         
         $builder = ServiceBuilder::factory($this->app[self::APP_SERVICES]);
         $client  = $builder->get($name, $config);
+        $client->setDescription(ServiceDescription::factory($config['description']));
         $plugin = new \Guzzle\Plugin\Oauth\OauthPlugin($config);
         $client->addSubscriber($plugin);
         
@@ -111,11 +117,7 @@ class ServiceProvider implements ServiceProviderInterface
             throw new Exception('Worker is not configured.', 500);
         }
         
-        $config = $this->app[self::APP_WORKER_CONFIG];
-        $client = $this->buildService('Worker', $config);
-        
-        
-        return $client;
+        return $this->buildService('Worker', $this->app[self::APP_WORKER_CONFIG]);
     }
     
     /**
@@ -130,12 +132,7 @@ class ServiceProvider implements ServiceProviderInterface
             throw new Exception('Server is not configured.', 500);
         }
         
-        $config = $this->app[self::APP_SERVER_CONFIG];
-        $client = new ServerClient($config['base_url'], $config);
-        $plugin = new \Guzzle\Plugin\Oauth\OauthPlugin($config);
-        $client->addSubscriber($plugin);
-        
-        return $client;
+        return $this->buildService('Server', $this->app[self::APP_SERVER_CONFIG]);
     }
 
     public function boot(Application $app)
