@@ -121,21 +121,6 @@ class ServiceProviderTest extends \PHPUnit_Framework_TestCase implements EventSu
     }
     
     /**
-     * Ensures an exception is thrown if the oauth configuration is missing.
-     */
-    public function testApiNoDescriptionConfigurationException()
-    {
-        $this->app[ServiceProvider::APP_SERVICES] = __DIR__ . '/testdata/testservices.json';
-        $this->app[ServiceProvider::APP_WORKER_CONFIG] = array(
-            'base_url' => 'http://test.com',
-        );
-        $this->serviceProvider->register($this->app);
-        
-        $this->setExpectedException("\Metagist\Api\Exception", 'description');
-        $this->serviceProvider->worker();
-    }
-    
-    /**
      * Ensures a log plugin is listening if a logger is available.
      */
     public function testServiceProviderAddsMonologPlugin()

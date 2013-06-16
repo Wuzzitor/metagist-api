@@ -98,10 +98,6 @@ class ServiceProvider implements ServiceProviderInterface
      */
     protected function buildService($name, array $config)
     {
-        if (!array_key_exists('description', $config)) {
-            throw new Exception('Service description not configured', 500);
-        }
-        
         if (!array_key_exists('consumer_key', $config)) {
             throw new Exception('OAuth consumer key not configured', 500);
         }
@@ -112,7 +108,9 @@ class ServiceProvider implements ServiceProviderInterface
         
         $builder = ServiceBuilder::factory($this->app[self::APP_SERVICES]);
         $client  = $builder->get($name, $config);
-        $client->setDescription(ServiceDescription::factory($config['description']));
+        $client->setDescription(
+            ServiceDescription::factory($this->getDefaultDescription($name))
+        );
         $plugin = new \Guzzle\Plugin\Oauth\OauthPlugin($config);
         $client->addSubscriber($plugin);
         
@@ -124,6 +122,17 @@ class ServiceProvider implements ServiceProviderInterface
         }
         
         return $client;
+    }
+    
+    /**
+     * Returns the path to the default json service description.
+     * 
+     * @param string $name
+     * @return string
+     */
+    protected function getDefaultDescription($name)
+    {
+        return realpath(__DIR__ . '/../../../services/' . $name . '.json');
     }
     
     /**
