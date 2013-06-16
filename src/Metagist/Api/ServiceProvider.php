@@ -43,6 +43,13 @@ class ServiceProvider implements ServiceProviderInterface
     const APP_SERVER_CONFIG = 'metagist.server.config';
     
     /**
+     * Key where a monolog instance must be present to enable logging.
+     * 
+     * @var string
+     */
+    const APP_MONOLOG = 'monolog';
+    
+    /**
      * app instance.
      * 
      * @var \Silex\Application
@@ -101,6 +108,13 @@ class ServiceProvider implements ServiceProviderInterface
         $client->setDescription(ServiceDescription::factory($config['description']));
         $plugin = new \Guzzle\Plugin\Oauth\OauthPlugin($config);
         $client->addSubscriber($plugin);
+        
+        if (isset($this->app[self::APP_MONOLOG]) && $this->app[self::APP_MONOLOG] instanceof \Monolog\Logger) {
+            $plugin = new \Guzzle\Plugin\Log\LogPlugin(
+                new \Guzzle\Log\MonologLogAdapter($this->app[self::APP_MONOLOG])
+            );
+            $client->addSubscriber($plugin);
+        }
         
         return $client;
     }

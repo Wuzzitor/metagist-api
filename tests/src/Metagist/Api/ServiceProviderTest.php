@@ -132,4 +132,57 @@ class ServiceProviderTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException("\Metagist\Api\Exception", 'description');
         $this->serviceProvider->worker();
     }
+    
+    /**
+     * Ensures a log plugin is listening if a logger is available.
+     */
+    public function testServiceProviderAddsMonologPlugin()
+    {
+        $this->app['monolog'] = new \Monolog\Logger('test');
+        $this->app[ServiceProvider::APP_SERVICES] = __DIR__ . '/testdata/testservices.json';
+        $this->app[ServiceProvider::APP_WORKER_CONFIG] = array(
+            'base_url' => 'http://test.com',
+            'description' => realpath(__DIR__ . '/../../../../services/Worker.json'),
+            'consumer_key' => 'worker1',
+            'consumer_secret' => 'test'
+        );
+        $this->serviceProvider->register($this->app);
+        
+        $worker = $this->serviceProvider->worker();
+        /* @var $worker \Guzzle\Service\Client */
+        $listeners = $worker->getEventDispatcher()->getListeners('request.before_send');
+        foreach ($listeners as $data) {
+            if ($data[0] instanceof \Guzzle\Plugin\Log\LogPlugin) {
+                return;
+            }
+        }
+        
+        $this->fail('No log plugin found.');
+    }
+    
+    /**
+     * Ensures that an oauth plugin is listening.
+     */
+    public function testServiceProviderAddsOauthPlugin()
+    {
+        $this->app[ServiceProvider::APP_SERVICES] = __DIR__ . '/testdata/testservices.json';
+        $this->app[ServiceProvider::APP_WORKER_CONFIG] = array(
+            'base_url' => 'http://test.com',
+            'description' => realpath(__DIR__ . '/../../../../services/Worker.json'),
+            'consumer_key' => 'worker1',
+            'consumer_secret' => 'test'
+        );
+        $this->serviceProvider->register($this->app);
+        
+        $worker = $this->serviceProvider->worker();
+        /* @var $worker \Guzzle\Service\Client */
+        $listeners = $worker->getEventDispatcher()->getListeners('request.before_send');
+        foreach ($listeners as $data) {
+            if ($data[0] instanceof \Guzzle\Plugin\Oauth\OauthPlugin) {
+                return;
+            }
+        }
+        
+        $this->fail('No oauth plugin found.');
+    }
 }
