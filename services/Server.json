@@ -1,0 +1,25 @@
+{
+    "name": "Server",
+    "apiVersion": "0.1",
+    "description": "Metagist Server Client",
+    "operations": {
+        "Package": {
+            "httpMethod": "GET",
+            "uri": "package/{author}/{name}",
+            "summary": "Returns info on a package, creates the package if necessary.",
+            "parameters": {
+                "author": {
+                    "description": "Package author/owner name",
+                    "type": "string",
+                    "location": "uri"
+                },
+                "name": {
+                    "description": "Name of the package.",
+                    "type": "string",
+                    "location": "uri"
+                }
+            }
+        }
+    },
+    "models": {}
+}

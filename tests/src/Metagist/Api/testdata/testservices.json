@@ -1,0 +1,18 @@
+{
+    "services": {
+        "Server": {
+            "class": "\\Metagist\\Api\\ServerClient",
+            "params": {
+                "consumer_key": "to be configured in the application",
+                "consumer_secret": "to be configured in the application"
+            }
+        },
+        "Worker": {
+            "class": "\\Metagist\\Api\\WorkerClient",
+            "params": {
+                "consumer_key": "to be configured in the application",
+                "consumer_secret": "to be configured in the application"
+            }
+        }
+    }
+}
