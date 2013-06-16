@@ -1,0 +1,26 @@
+{
+    "name"        : "wuzzitor/metagist-api",
+    "type"        : "library",
+    "description" : "Metagist API libraries",
+    "homepage"    : "http://metagist.org",
+    "keywords"    : ["metagist", "api"],
+    "license"     : "MIT",
+    "authors"     : [
+        {
+            "name"  : "Daniel Pozzi",
+            "email" : "bonndan76@googlemail.com"
+        }
+    ],
+    "require": {
+        "php"                   : ">=5.3.3",
+        "guzzle/guzzle"         : "v3.7.0"
+    },
+    "require-dev": {
+        "silex/silex"           : "1.0.*@dev"
+    },
+    "autoload": {
+        "psr-0": {
+            "Metagist": "src/"
+        }
+    }
+}
