@@ -83,8 +83,20 @@ class ServiceProvider implements ServiceProviderInterface
      */
     protected function buildService($name, array $config)
     {
+        if (!array_key_exists('consumer_key', $config)) {
+            throw new Exception('OAuth consumer key not configured', 500);
+        }
+        
+        if (!array_key_exists('consumer_secret', $config)) {
+            throw new Exception('OAuth consumer secret not configured', 500);
+        }
+        
         $builder = ServiceBuilder::factory($this->app[self::APP_SERVICES]);
-        return $builder->get($name, $config);
+        $client  = $builder->get($name, $config);
+        $plugin = new \Guzzle\Plugin\Oauth\OauthPlugin($config);
+        $client->addSubscriber($plugin);
+        
+        return $client;
     }
     
     /**
@@ -101,8 +113,7 @@ class ServiceProvider implements ServiceProviderInterface
         
         $config = $this->app[self::APP_WORKER_CONFIG];
         $client = $this->buildService('Worker', $config);
-        $plugin = new \Guzzle\Plugin\Oauth\OauthPlugin($config);
-        $client->addSubscriber($plugin);
+        
         
         return $client;
     }

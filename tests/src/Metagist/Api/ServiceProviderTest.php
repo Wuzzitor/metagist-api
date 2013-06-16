@@ -73,7 +73,11 @@ class ServiceProviderTest extends \PHPUnit_Framework_TestCase
     public function testApiProvidesWorkerInterface()
     {
         $this->app[ServiceProvider::APP_SERVICES] = __DIR__ . '/testdata/testservices.json';
-        $this->app[ServiceProvider::APP_WORKER_CONFIG] = array('base_url' => 'http://test.com');
+        $this->app[ServiceProvider::APP_WORKER_CONFIG] = array(
+            'base_url' => 'http://test.com',
+            'consumer_key' => 'worker1',
+            'consumer_secret' => 'test'
+        );
         $this->serviceProvider->register($this->app);
         
         $worker = $this->serviceProvider->worker();
@@ -89,6 +93,21 @@ class ServiceProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->serviceProvider->register($this->app);
         $this->setExpectedException("\Metagist\Api\Exception");
+        $this->serviceProvider->worker();
+    }
+    
+    /**
+     * Ensures an exception is thrown if the oauth configuration is missing.
+     */
+    public function testApiNoOauthConfigurationException()
+    {
+        $this->app[ServiceProvider::APP_SERVICES] = __DIR__ . '/testdata/testservices.json';
+        $this->app[ServiceProvider::APP_WORKER_CONFIG] = array(
+            'base_url' => 'http://test.com',
+        );
+        $this->serviceProvider->register($this->app);
+        
+        $this->setExpectedException("\Metagist\Api\Exception", 'OAuth');
         $this->serviceProvider->worker();
     }
 }
