@@ -3,12 +3,14 @@ namespace Metagist\Api;
 
 require_once __DIR__ . '/bootstrap.php';
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
 /**
  * Tests the api service provider
  * 
  * @author Daniel Pozzi <bonndan76@googlemail.com>
  */
-class ServiceProviderTest extends \PHPUnit_Framework_TestCase
+class ServiceProviderTest extends \PHPUnit_Framework_TestCase implements EventSubscriberInterface
 {
     /**
      * system under test
@@ -184,5 +186,59 @@ class ServiceProviderTest extends \PHPUnit_Framework_TestCase
         }
         
         $this->fail('No oauth plugin found.');
+    }
+    
+    /**
+     * Ensures the whole oath integration works. 
+     */
+    public function testOAuthIntegration()
+    {
+        $this->app[ServiceProvider::APP_SERVICES] = __DIR__ . '/testdata/testservices.json';
+        $this->app[ServiceProvider::APP_CONSUMERS] = array(
+            'worker1' => 'test'
+        );
+        $this->app[ServiceProvider::APP_WORKER_CONFIG] = array(
+            'base_url' => 'http://localhost',
+            'description' => realpath(__DIR__ . '/../../../../services/Worker.json'),
+            'consumer_key' => 'worker1',
+            'consumer_secret' => 'test'
+        );
+        $this->serviceProvider->register($this->app);
+        
+        $worker = $this->serviceProvider->worker();
+        $worker->addSubscriber($this);
+        try {
+            $worker->scan('authorname', 'packagename');
+        } catch (\Guzzle\Http\Exception\ClientErrorResponseException $exception) {
+            /*
+             * do nothing.
+             * @see dump()
+             */
+        }
+        
+    }
+    
+    /**
+     * Registers "dump" as callback 
+     * @return array
+     */
+    public static function getSubscribedEvents()
+    {
+        return array(
+            'request.complete' => array("dump", -1)
+        );
+    }
+
+    /**
+     * Callback.
+     * 
+     * @param \Symfony\Component\EventDispatcher\Event $event
+     */
+    public function dump(\Symfony\Component\EventDispatcher\Event $event)
+    {
+        $request = $event['request'];
+        /* @var $request \Guzzle\Http\Message\Request */
+        $message = $request->__toString();
+        $this->serviceProvider->validateRequest($message);
     }
 }

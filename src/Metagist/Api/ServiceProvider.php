@@ -29,6 +29,13 @@ class ServiceProvider implements ServiceProviderInterface
     const APP_SERVICES = 'metagist.services';
     
     /**
+     * App key under which the service consumers are registered.
+     * 
+     * @var string
+     */
+    const APP_CONSUMERS = 'metagist.consumers';
+    
+    /**
      * App key under which the worker config is registered.
      * 
      * @var string
@@ -147,6 +154,23 @@ class ServiceProvider implements ServiceProviderInterface
         }
         
         return $this->buildService('Server', $this->app[self::APP_SERVER_CONFIG]);
+    }
+    
+    /**
+     * Performs two-legged oauth validation.
+     * 
+     * @param string $message raw incoming message.
+     * @return string the consumer key of the sender.
+     */
+    public function validateRequest($message)
+    {
+        if (!isset($this->app[self::APP_CONSUMERS])) {
+            throw new Exception('Service consumers are not configured.', 500);
+        }
+        
+        $validator = new OAuthValidator($this->app[self::APP_CONSUMERS]);
+        $validator->validateRequest($message);
+        return $validator->getConsumerKey();
     }
 
     public function boot(Application $app)
