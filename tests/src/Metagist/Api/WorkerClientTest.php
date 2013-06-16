@@ -31,7 +31,7 @@ class WorkerClientTest extends \PHPUnit_Framework_TestCase
     /**
      * Ensures the client implements \Metagist\Api\WorkerInterface
      */
-    public function testRegistersApiCallback()
+    public function testImplementsInterface()
     {
         $this->assertInstanceOf("\Metagist\Api\WorkerInterface", $this->client);
     }

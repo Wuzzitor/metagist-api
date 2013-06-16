@@ -19,7 +19,13 @@ class ServerClient extends Client implements ServerInterface
      */
     public function package($author, $name)
     {
-        
+        $args = array(
+            'author' => $author,
+            'name'   => $name
+        );
+        /* @var $command Guzzle\Service\Command\CommandInterface */
+        $command = $this->getCommand('package', $args);
+        return $command->execute();
     }
 
     /**
@@ -32,7 +38,14 @@ class ServerClient extends Client implements ServerInterface
      */
     public function pushInfo($author, $name, array $data = array())
     {
-        
+        $args = array(
+            'author' => $author,
+            'name'   => $name,
+            'data'   => $data
+        );
+        /* @var $command Guzzle\Service\Command\CommandInterface */
+        $command = $this->getCommand('pushInfo', $args);
+        return $command->execute();
     }
 
 }

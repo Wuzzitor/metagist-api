@@ -19,6 +19,28 @@
                     "location": "uri"
                 }
             }
+        },
+        "pushInfo": {
+            "httpMethod": "POST",
+            "uri": "pushInfo/{author}/{name}",
+            "summary": "Provides metainfo for a package",
+            "parameters": {
+                "author": {
+                    "description": "Package author/owner name",
+                    "type": "string",
+                    "location": "uri"
+                },
+                "name": {
+                    "description": "Name of the package.",
+                    "type": "string",
+                    "location": "uri"
+                },
+                "data": {
+                    "description": "Metainfo data",
+                    "type": "array",
+                    "location": "json"
+                }
+            }
         }
     },
     "models": {}
