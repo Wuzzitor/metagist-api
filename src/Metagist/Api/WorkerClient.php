@@ -8,7 +8,7 @@ use Guzzle\Service\Client;
  * 
  * @author Daniel Pozzi <bonndan76@googlemail.com>
  */
-class WorkerClient extends Client  implements WorkerInterface 
+class WorkerClient extends Client implements WorkerInterface 
 {
     /**
      * Triggers the remote procedure "scan".
@@ -18,6 +18,12 @@ class WorkerClient extends Client  implements WorkerInterface
      */
     public function scan($author, $name)
     {
-        
+        $args = array(
+            'author' => $author,
+            'name'   => $name
+        );
+        /* @var $command Guzzle\Service\Command\CommandInterface */
+        $command = $this->getCommand('scan', $args);
+        return $command->execute();
     }
 }
