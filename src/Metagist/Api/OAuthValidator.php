@@ -80,7 +80,12 @@ class OAuthValidator
      */
     protected function retrieveAuthorizationParams(\Guzzle\Http\Message\Request $request)
     {
-        $line = current($request->getHeader('Authorization')->toArray());
+        $authHeader = $request->getHeader('Authorization');
+        if ($authHeader === null) {
+            throw new Exception('Missing Authorization header', 401);
+        }
+        
+        $line = current($authHeader->toArray());
         if (strpos($line, 'OAuth ') === false) {
             throw new Exception('Unexpected Authorization header', 500);
         }
