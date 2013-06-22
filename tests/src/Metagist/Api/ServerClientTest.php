@@ -53,10 +53,19 @@ class ServerClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testPushInfo()
     {
-        try {
-            $this->client->pushInfo('author', 'name', array());
-        } catch (\Guzzle\Http\Exception\CurlException $exception) {
-            $this->assertContains('pushInfo/author/name', $exception->getMessage());
-        }
+        $plugin = new \Guzzle\Plugin\Mock\MockPlugin();
+        $plugin->addResponse(new \Guzzle\Http\Message\Response(200));
+        $this->client->addSubscriber($plugin);
+        
+        $info = \Metagist\MetaInfo::fromValue('test/test', 'avalue');
+        $this->client->pushInfo('author', 'name', $info);
+        
+        
+        $requests = $plugin->getReceivedRequests();
+        $this->assertNotEmpty($requests);
+        $request = current($requests); /* @var $request \Guzzle\Http\Message\Request */
+        $this->assertContains('pushInfo/author/name', $request->getPath());
+        
+        $this->assertContains('{"category":"test","group":"test","value":"avalue"}', $request->__toString());
     }
 }
