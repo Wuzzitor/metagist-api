@@ -14,14 +14,31 @@
     "require": {
         "php"                   : ">=5.3.3",
         "guzzle/guzzle"         : "v3.7.0",
-        "monolog/monolog"       : "~1.0"
+        "monolog/monolog"       : "~1.0",
+        "jms/serializer"        : "0.12.0"
     },
     "require-dev": {
-        "silex/silex"           : "1.0.*@dev"
+        "silex/silex"           : "1.0.*@dev",
+        "wuzzitor/metagist.org" : "0.0.4"
     },
     "autoload": {
         "psr-0": {
-            "Metagist\\Api": "src/"
+            "Metagist\\Api"     : "src/",
+            "Metagist"          : "vendor/wuzzitor/metagist.org/src"
         }
-    }
+    },
+    "repositories": [
+        { 
+            "type": "package",
+            "package": {
+                "name": "wuzzitor/metagist.org",
+                "version": "0.0.4",
+                "source": {
+                    "url": "https://github.com/Wuzzitor/metagist.org.git",
+                    "type": "git",
+                    "reference": "0.0.4"
+                }
+            }
+        }
+    ]
 }
