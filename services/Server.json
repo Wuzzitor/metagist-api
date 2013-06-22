@@ -43,25 +43,31 @@
                     "instanceOf": "Metagist\\MetaInfo",
                     "location"  : "body",
                     "required"  : true,
-                    "sentAs"    : "json"
+                    "sentAs"    : "json",
+                    "properties": {
+                        "category": {
+                            "type": "string",
+                            "description": "The information category.",
+                            "required": true
+                        },
+                        "group": {
+                            "type": "string",
+                            "description": "The information group under the category.",
+                            "required": true
+                        },
+                        "value": {
+                            "type": "string",
+                            "description": "The information content.",
+                            "required": true
+                        },
+                        "version": {
+                            "type": "string",
+                            "description": "Optional version number"
+                        }
+                    }
                 }
             }
         }
     },
-    "models": {
-        "pushInfo": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "location": "json",
-                    "type": "string"
-                },
-                "location": {
-                    "location": "header",
-                    "sentAs": "Location",
-                    "type": "string"
-                }
-            }
-        }
-    }
+    "models": {}
 }
