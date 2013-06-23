@@ -7,6 +7,7 @@
             "httpMethod": "GET",
             "uri": "package/{author}/{name}",
             "summary": "Returns info on a package, creates the package if necessary.",
+            "responseClass": "\\Metagist\\Api\\PackageResponse",
             "parameters": {
                 "author": {
                     "description": "Package author/owner name",
