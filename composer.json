@@ -19,7 +19,8 @@
     },
     "require-dev": {
         "silex/silex"           : "1.0.*@dev",
-        "wuzzitor/metagist.org" : "0.0.4"
+        "wuzzitor/metagist.org" : "0.1.0",
+        "doctrine/common"       : "2.3.0"
     },
     "autoload": {
         "psr-0": {
@@ -32,11 +33,11 @@
             "type": "package",
             "package": {
                 "name": "wuzzitor/metagist.org",
-                "version": "0.0.4",
+                "version": "0.1.0",
                 "source": {
                     "url": "https://github.com/Wuzzitor/metagist.org.git",
                     "type": "git",
-                    "reference": "0.0.4"
+                    "reference": "0.1.0"
                 }
             }
         }
