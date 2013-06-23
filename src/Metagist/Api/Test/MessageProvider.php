@@ -3,6 +3,7 @@ namespace Metagist\Api\Test;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Metagist\Api\ServiceProvider;
+use Guzzle\Common\Event;
 
 /**
  * Provides a signed request for testing purposes.
@@ -16,7 +17,7 @@ class MessageProvider implements EventSubscriberInterface
     
     /**
      * system under test
-     * @var Application
+     * @var \Metagist\Api\ServiceProvider
      */
     private $serviceProvider;
     
@@ -32,6 +33,12 @@ class MessageProvider implements EventSubscriberInterface
      * @var string
      */
     private $message;
+    
+    /**
+     * Fake timestamp
+     * @var type 
+     */
+    private $timestamp;
     
     /**
      * 
@@ -87,7 +94,8 @@ class MessageProvider implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            'request.complete' => array("dump", -1)
+            'request.complete' => array("dump", -1),
+            'request.before_send' => array('modifyTimestamp', -999)
         );
     }
 
@@ -101,5 +109,27 @@ class MessageProvider implements EventSubscriberInterface
         $request = $event['request'];
         /* @var $request \Guzzle\Http\Message\Request */
         $this->message = $request->__toString();
+    }
+    
+    /**
+     * Set a fake timestamp to use for signing the request.
+     * 
+     * @param type $timestamp
+     */
+    public function setFakeTimestamp($timestamp)
+    {
+        $this->timestamp = $timestamp;
+    }
+    
+    /**
+     * Callback.
+     * 
+     * @param \Metagist\Api\Test\Event $event
+     */
+    public function modifyTimestamp(Event $event)
+    {
+        if ($this->timestamp !== null) {
+            $event['timestamp'] = $this->timestamp;
+        }
     }
 }
