@@ -27,6 +27,13 @@ class OAuthValidator
     protected $authParams = array();
     
     /**
+     * maximum age of the request in seconds (oauth_timestamp)
+     * 
+     * @var int
+     */
+    protected $maxAge = 60;
+    
+    /**
      * Pass the allowed consumers.
      * 
      * @param array $consumers
@@ -44,9 +51,9 @@ class OAuthValidator
      */
     public function validateRequest($message)
     {
-        $factory     = new \Guzzle\Http\Message\RequestFactory();
-        $request     = $factory->fromMessage($message);
-        $this->retrieveAuthorizationParams($request);
+        $factory          = new \Guzzle\Http\Message\RequestFactory();
+        $request          = $factory->fromMessage($message);
+        $this->authParams = $this->getAuthorizationParams($request);
         
         $consumerKey = $this->getConsumerKey();
         if (!isset($this->consumers[$consumerKey])) {
@@ -70,15 +77,22 @@ class OAuthValidator
         if ($signature != $this->getSignature()) {
             throw new Exception('Signature mismatch.', 401);
         }
+        
+        $now = time();
+        $timeDiff = abs($this->getTimestamp() - time());
+        if ($timeDiff > $this->maxAge) {
+            throw new Exception('Timestamp mismatch: ' .$this->getTimestamp() . ' : ' . $now, 401);
+        }
     }
     
     /**
      * Parses the Authorization header into a map.
      * 
      * @param \Guzzle\Http\Message\Request $request
+     * @return array
      * @throws Exception
      */
-    protected function retrieveAuthorizationParams(\Guzzle\Http\Message\Request $request)
+    public function getAuthorizationParams(\Guzzle\Http\Message\Request $request)
     {
         $authHeader = $request->getHeader('Authorization');
         if ($authHeader === null) {
@@ -92,9 +106,13 @@ class OAuthValidator
         
         $request->setHeader('Authorization', substr($line, strlen('OAuth ')));
         $oAuthParams = $request->getHeader('Authorization')->parseParams();
+        
+        $params = array();
         foreach ($oAuthParams as $data) {
-            $this->authParams[key($data)] = current($data);
+            $params[key($data)] = current($data);
         }
+        
+        return $params;
     }
     
     /**
