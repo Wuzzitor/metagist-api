@@ -13,7 +13,8 @@ interface ServerInterface
      * 
      * @param string $author
      * @param string $name
-     * @return mixed
+     * @return \Metagist\Package
+     * @throws \Metagist\Api\Exception
      */
     public function package($author, $name);
     

@@ -15,7 +15,7 @@ class ServerClient extends Client implements ServerInterface
      * 
      * @param string $author
      * @param string $name
-     * @return array
+     * @return \Metagist\Package
      */
     public function package($author, $name)
     {
@@ -24,8 +24,11 @@ class ServerClient extends Client implements ServerInterface
             'name'   => $name
         );
         /* @var $command Guzzle\Service\Command\CommandInterface */
-        $command = $this->getCommand('package', $args);
-        return $command->execute();
+        $command  = $this->getCommand('package', $args);
+        
+        /* @var $response \Metagist\Api\PackageResponse */
+        $response = $command->execute();
+        return $response->getPackage();
     }
 
     /**
