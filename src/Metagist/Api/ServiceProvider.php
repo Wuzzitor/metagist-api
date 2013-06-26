@@ -12,7 +12,7 @@ use Guzzle\Service\Description\ServiceDescription;
  * @author Daniel Pozzi <bonndan76@googlemail.com>
  * @link https://github.com/guzzle/guzzle-silex-extension/blob/master/GuzzleServiceProvider.php
  */
-class ServiceProvider implements ServiceProviderInterface
+class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
 {
     /**
      * App key under which the service provider is registered.
@@ -180,6 +180,17 @@ class ServiceProvider implements ServiceProviderInterface
         $validator = new OAuthValidator($this->app[self::APP_CONSUMERS]);
         $validator->validateRequest($message);
         return $validator->getConsumerKey();
+    }
+    
+    /**
+     * Returns a serializer instance.
+     * 
+     * @todo might need configuration
+     * @todo might be replaced by guzzle features
+     */
+    public function getSerializer()
+    {
+        return \JMS\Serializer\SerializerBuilder::create()->build();
     }
 
     public function boot(Application $app)
