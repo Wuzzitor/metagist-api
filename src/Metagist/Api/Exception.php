@@ -8,5 +8,5 @@ namespace Metagist\Api;
  */
 class Exception extends \Exception
 {
-    
+    const WORKER_ERROR = 1000;
 }

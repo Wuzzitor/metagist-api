@@ -47,4 +47,17 @@ class WorkerClientTest extends \PHPUnit_Framework_TestCase
             $this->assertContains('scan/author/name', $exception->getMessage());
         }
     }
+    
+    /**
+     * Ensures guzzles bad response exception are caught.
+     */
+    public function testScanCatchesBadResponseExceptions()
+    {
+        $mock = new \Guzzle\Plugin\Mock\MockPlugin();
+        $mock->addResponse(new \Guzzle\Http\Message\Response(403));
+        $this->client->addSubscriber($mock);
+
+        $this->setExpectedException("\Metagist\Api\Exception");
+        $this->client->scan('test', 'test');
+    }
 }

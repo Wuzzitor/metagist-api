@@ -77,7 +77,7 @@ class MessageProvider implements EventSubscriberInterface
         $worker->addSubscriber($this);
         try {
             $worker->scan('authorname', 'packagename');
-        } catch (\Guzzle\Http\Exception\ClientErrorResponseException $exception) {
+        } catch (\Metagist\Api\Exception $exception) {
             /*
              * do nothing.
              * @see dump()

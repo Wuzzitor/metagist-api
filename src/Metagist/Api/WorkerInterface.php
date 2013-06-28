@@ -14,6 +14,7 @@ interface WorkerInterface
      * @param string $author
      * @param string $name
      * @return void (asynchronous)
+     * @throws \Metagist\Api\Exception
      */
     public function scan($author, $name);
 }
