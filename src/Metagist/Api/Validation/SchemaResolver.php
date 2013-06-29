@@ -6,6 +6,8 @@ use Guzzle\Service\Command\OperationCommand;
 /**
  * Class to resolve schema locations based on operation names (mapped by configuration).
  * 
+ * Methods return a schema object or null if validation is disabled.
+ * 
  * @author Daniel Pozzi <bonndan76@googlemail.com>
  */
 class SchemaResolver
