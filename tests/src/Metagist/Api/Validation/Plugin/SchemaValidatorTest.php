@@ -34,7 +34,8 @@ class SchemaValidatorTest extends \PHPUnit_Framework_TestCase
         $config = array(
             'basepath' => __DIR__,
             'mapping'  => array(
-                'pushInfo' => realpath(__DIR__ . '/../../../../../../services/pushInfo.schema.json')
+                'pushInfo' => realpath(__DIR__ . '/../../../../../../services/pushInfo.schema.json'),
+                'disabled' => null
             )
         );
         $resolver = new \Metagist\Api\Validation\SchemaResolver($config);
@@ -151,7 +152,7 @@ class SchemaValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * Ensures the resolver exception is not caught.
      */
-    public function testValidateMessageHasNoSchema()
+    public function testValidateRequestHasNoMapping()
     {
         $messageProvider = new \Metagist\Api\Test\MessageProvider();
         $message = $messageProvider->getPushInfoMessage();
@@ -162,11 +163,23 @@ class SchemaValidatorTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException("\Metagist\Api\Validation\Exception");
         $this->validator->validateRequest($request, 'unknown');
     }
+    
+    /**
+     * Ensures the no validation takes place if null has been configured.
+     */
+    public function testValidationIsDisabled()
+    {
+        $factory = new \Guzzle\Http\Message\RequestFactory();
+        $faulty  = $factory->fromParts('POST', array(), null, '{"info":{"group":"testInteger"}');
+        
+        $this->setExpectedException(null);
+        $this->validator->validateRequest($faulty, 'disabled');
+    }
 
     /**
      * Ensures an invalid message causes an exception to be thrown.
      */
-    public function testValidateMessageFails()
+    public function testValidateRequestFails()
     {
         $factory = new \Guzzle\Http\Message\RequestFactory();
         $request = $factory->fromParts('POST', array(), null, '{"info":{"group":"testInteger"}');

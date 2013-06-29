@@ -82,12 +82,16 @@ class SchemaValidator implements EventSubscriberInterface
     /**
      * Validates the payload.
      * 
-     * @param object $data
-     * @param object $schema
+     * @param object      $data
+     * @param object|null $schema
      * @throws \Metagist\Api\Validation\Exception
      */
     protected function validate($data, $schema)
     {
+        if ($schema === null) {
+            return;
+        }
+        
         $validator = new \JsonSchema\Validator();
         $validator->check($data, $schema);
 
