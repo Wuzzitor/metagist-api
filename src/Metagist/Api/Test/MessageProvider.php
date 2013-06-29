@@ -58,6 +58,10 @@ class MessageProvider implements EventSubscriberInterface
             'base_url' => 'http://localhost',
             'description' => realpath(__DIR__ . '/../../../../services/Worker.json'),
         );
+        $this->app[ServiceProvider::APP_SERVER_CONFIG] = array(
+            'base_url' => 'http://localhost',
+            'description' => realpath(__DIR__ . '/../../../../services/Server.json'),
+        );
         $this->serviceProvider->register($this->app);
     }
     
@@ -68,16 +72,57 @@ class MessageProvider implements EventSubscriberInterface
      */
     public function getMessage ($consumerKey = self::CONSUMER_KEY, $consumerSecret = self::CONSUMER_SECRET)
     {
+        $worker = $this->getWorker($consumerKey, $consumerSecret);
+        $worker->addSubscriber($this);
+        try {
+            $worker->scan('authorname', 'packagename');
+        } catch (\Metagist\Api\Exception $exception) {
+            /*
+             * do nothing.
+             * @see dump()
+             */
+        }
+        
+        return $this->message;
+    }
+    
+    /**
+     * Returns a configured worker.
+     * 
+     * @param type $consumerKey
+     * @param type $consumerSecret
+     * @return \Metagist\Api\WorkerInterface
+     */
+    protected function getWorker($consumerKey = self::CONSUMER_KEY, $consumerSecret = self::CONSUMER_SECRET)
+    {
         $config = $this->app[ServiceProvider::APP_WORKER_CONFIG];
         $config['consumer_key'] = $consumerKey;
         $config['consumer_secret'] = $consumerSecret;
         $this->app[ServiceProvider::APP_WORKER_CONFIG]= $config;
         
         $worker = $this->serviceProvider->worker();
-        $worker->addSubscriber($this);
+        
+        return $worker;
+    }
+    
+    /**
+     * Returns the raw request message for the "pushInfo" request.
+     * 
+     * @return string
+     */
+    public function getPushInfoMessage()
+    {
+        $config = $this->app[ServiceProvider::APP_SERVER_CONFIG];
+        $config['consumer_key'] = self::CONSUMER_KEY;
+        $config['consumer_secret'] = self::CONSUMER_SECRET;
+        $this->app[ServiceProvider::APP_SERVER_CONFIG]= $config;
+        
+        $server = $this->serviceProvider->server();
+        $server->addSubscriber($this);
+        
         try {
-            $worker->scan('authorname', 'packagename');
-        } catch (\Metagist\Api\Exception $exception) {
+            $server->pushInfo('author', 'name', \Metagist\MetaInfo::fromValue('testInteger', 1, '0.1.1'));
+        } catch (\Guzzle\Http\Exception\ClientErrorResponseException $exception) {
             /*
              * do nothing.
              * @see dump()
