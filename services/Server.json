@@ -44,13 +44,7 @@
                     "instanceOf": "Metagist\\MetaInfo",
                     "location"  : "body",
                     "required"  : true,
-                    "sentAs"    : "json",
                     "properties": {
-                        "category": {
-                            "type": "string",
-                            "description": "The information category.",
-                            "required": true
-                        },
                         "group": {
                             "type": "string",
                             "description": "The information group under the category.",
