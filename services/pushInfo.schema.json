@@ -1,15 +1,14 @@
 {
-	"type":"object",
-	"$schema": "http://json-schema.org/draft-03/schema",
-	"name": "metaInfo",
-	"id": "http://metagist.org/metainfo",
-	"required":true,
-	"properties":{
-		"info": {
-			"type":"object",
-			"id": "http://metagist.org/pushInfo/info",
-            "ref": "http://metagist.org/metaInfo",
-			"required":true
-		}
-	}
+    "type": "object",
+    "$schema": "http://json-schema.org/draft-03/schema",
+    "name": "pushInfo",
+    "id": "http://metagist.org/metainfo",
+    "properties": {
+        "info": {
+            "type": "object",
+            "id": "http://metagist.org/pushInfo/info",
+            "ref": "http://metagist.org/metaInfo"
+        }
+    },
+    "required" : ["info"]
 }

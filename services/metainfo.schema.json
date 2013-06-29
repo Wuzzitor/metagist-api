@@ -1,24 +1,21 @@
 {
-	"type":"object",
-	"$schema": "http://json-schema.org/draft-03/schema",
-	"name": "metaInfo",
-	"id": "http://metagist.org/metaInfo",
-	"required":true,
-	"properties":{
-		"group": {
-			"type":"string",
-			"id": "http://metagist.org/metaInfo/group",
-			"required":true
-		},
-		"value": {
-			"type":["string","number","integer","boolean"],
-			"id": "http://metagist.org/metaInfo/value",
-			"required":true
-		},
-		"version": {
-			"type":"string",
-			"id": "http://metagist.org/metaInfo/version",
-			"required":true
-		}
-	}
+    "type"      : "object",
+    "$schema"   : "http://json-schema.org/draft-03/schema",
+    "name"      : "metaInfo",
+    "id"        : "http://metagist.org/metaInfo",
+    "properties": {
+        "group": {
+            "type": "string",
+            "id": "http://metagist.org/metaInfo/group"
+        },
+        "value": {
+            "type": ["string", "number", "integer", "boolean"],
+            "id": "http://metagist.org/metaInfo/value"
+        },
+        "version": {
+            "type": "string",
+            "id": "http://metagist.org/metaInfo/version"
+        }
+    },
+    "required": ["group", "value"]
 }
