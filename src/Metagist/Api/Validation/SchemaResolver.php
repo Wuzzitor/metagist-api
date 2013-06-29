@@ -21,7 +21,7 @@ class SchemaResolver
      * Pass the request-schema mapping.
      * 
      * basepath => string
-     * mapping  => array ( array (operationName => schema path) )
+     * mapping  => array ( array (operationName => schema path | null) )
      * 
      * @param array $config
      */
@@ -36,7 +36,7 @@ class SchemaResolver
      * If no schema is mapping to the operation name, null is returned.
      * 
      * @param \Guzzle\Service\Command\OperationCommand $request
-     * @return object
+     * @return object|null
      * @throws \Metagist\Api\Validation\Exception
      */
     public function getSchemaForCommand(OperationCommand $command)
@@ -48,13 +48,19 @@ class SchemaResolver
     /**
      * Finds and resolves a schema for an operation name.
      * 
+     * If the schema is defined as null, validation is bypassed.
+     * 
      * @param string $opName
-     * @return null
+     * @return object|null
      * @throws \Metagist\Api\Validation\Exception
      */
     public function getSchemaForOperationName($opName)
     {
-        $path      = $this->getSchemaPathForOperationName($opName);
+        $path = $this->getSchemaPathForOperationName($opName);
+        if ($path === null) {
+            return null;
+        }
+        
         if (!file_exists($path)) {
             throw new Exception('Cannot load schema for operation ' . $opName, 404);
         }

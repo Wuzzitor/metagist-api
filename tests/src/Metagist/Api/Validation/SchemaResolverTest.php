@@ -31,6 +31,7 @@ class SchemaResolverTest extends \PHPUnit_Framework_TestCase
                 'mapping' => array(
                     'pushInfo' => $pushInfo,
                     '404' => 'someSchema',
+                    'disabled' => null,
                 )
             )
         );
@@ -64,6 +65,15 @@ class SchemaResolverTest extends \PHPUnit_Framework_TestCase
     {
         $schema = $this->resolver->getSchemaForOperationName('pushInfo');
         $this->assertInternalType('object', $schema);
+    }
+    
+    /**
+     * Ensures successful resolving.
+     */
+    public function testGetSchemaForDisabledValidationIsNull()
+    {
+        $schema = $this->resolver->getSchemaForOperationName('disabled');
+        $this->assertNull($schema);
     }
     
     /**
