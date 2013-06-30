@@ -34,7 +34,7 @@ class SchemaValidatorTest extends \PHPUnit_Framework_TestCase
         $config = array(
             'basepath' => __DIR__,
             'mapping'  => array(
-                'pushInfo' => realpath(__DIR__ . '/../../../../../../services/pushInfo.schema.json'),
+                'pushInfo' => realpath(__DIR__ . '/../../../../../../services/api.pushInfo.schema.json'),
                 'disabled' => null
             )
         );
