@@ -75,7 +75,8 @@ class ServerClientTest extends \PHPUnit_Framework_TestCase
      */
     protected function encodePackage(\Metagist\Package $package)
     {
-        $serializer = \JMS\Serializer\SerializerBuilder::create()->build();
+        $serviceProvider = new ServiceProvider();
+        $serializer = $serviceProvider->getSerializer();
         return $serializer->serialize($package, 'json');
     }
     
