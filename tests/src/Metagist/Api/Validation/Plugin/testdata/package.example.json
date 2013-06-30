@@ -1,0 +1,17 @@
+{
+    "id": 2,
+    "identifier": "silex\/silex",
+    "versions": ["1.0.x-dev", "dev-master", "v1.0.0"],
+    "description": "The PHP micro-framework based on the Symfony2 Components",
+    "type": "",
+    "time_updated": "0000-00-00 00:00:00",
+    "meta_infos": [{"time_updated": "2013-05-30 23:09:29", "group": "repository", "version": "dev-master", "value": "git:\/\/github.com\/fabpot\/Silex.git"},
+        {"time_updated": "2013-05-30 23:09:29", "group": "homepage", "version": "dev-master", "value": "http:\/\/silex.sensiolabs.org"},
+        {"time_updated": "2013-05-30 23:09:29", "group": "maintainers", "version": "dev-master", "value": "1"},
+        {"time_updated": "2013-05-30 23:09:29", "group": "requires", "version": "dev-master", "value": "6"},
+        {"time_updated": "2013-05-30 23:09:29", "group": "requires.dev", "version": "dev-master", "value": "19"},
+        {"time_updated": "2013-05-30 23:09:29", "group": "license", "version": "dev-master", "value": "MIT"},
+        {"time_updated": "2013-05-30 23:09:29", "group": "contributors", "version": "dev-master", "value": "100"},
+        {"time_updated": "2013-05-30 23:09:30", "group": "commits", "version": "dev-master", "value": "0"}
+    ]
+}

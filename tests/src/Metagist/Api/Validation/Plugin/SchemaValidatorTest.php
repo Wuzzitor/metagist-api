@@ -35,6 +35,7 @@ class SchemaValidatorTest extends \PHPUnit_Framework_TestCase
             'basepath' => __DIR__,
             'mapping'  => array(
                 'pushInfo' => realpath(__DIR__ . '/../../../../../../services/api.pushInfo.json'),
+                'package'  => realpath(__DIR__ . '/../../../../../../services/api.package.json'),
                 'disabled' => null
             )
         );
@@ -186,6 +187,18 @@ class SchemaValidatorTest extends \PHPUnit_Framework_TestCase
         
         $this->setExpectedException("\Metagist\Api\Validation\Exception");
         $this->validator->validateRequest($request, 'pushInfo');
+    }
+    
+    /**
+     * Tests the package example response validation.
+     */
+    public function testValidatePackageResponse()
+    {
+        $factory = new \Guzzle\Http\Message\RequestFactory();
+        $body    = file_get_contents(__DIR__ . '/testdata/package.example.json');
+        $request = $factory->fromParts('POST', array(), null, $body);
         
+        $this->setExpectedException(NULL);
+        $this->validator->validateRequest($request, 'package');
     }
 }
