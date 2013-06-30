@@ -38,7 +38,7 @@ class PackageResponse implements ResponseClassInterface
         $json       = $command->getResponse()->json();
         $identifier = $json['identifier'];
         $package    = new \Metagist\Package($identifier);
-        $metainfos  = $json['meta_infos'];
+        $metainfos  = $json['metaInfos'];
         
         $collection = new \Doctrine\Common\Collections\ArrayCollection();
         foreach ($metainfos as $data) {
