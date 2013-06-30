@@ -212,4 +212,14 @@ class ServiceProviderTest extends \PHPUnit_Framework_TestCase
         $validator = $this->serviceProvider->getSchemaValidator();
         $this->assertInstanceOf("\Metagist\Api\Validation\Plugin\SchemaValidator", $validator);
     }
+    
+    /**
+     * Ensures the incoming request is returned as object
+     */
+    public function testGetIncomingRequest()
+    {
+        $_POST['test'] = 'test';
+        $request = $this->serviceProvider->getIncomingRequest();
+        $this->assertInstanceOf("\Symfony\Component\HttpFoundation\Request", $request);
+    }
 }

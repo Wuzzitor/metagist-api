@@ -7,6 +7,7 @@ use Guzzle\Service\Builder\ServiceBuilder;
 use Guzzle\Service\Description\ServiceDescription;
 use JMS\Serializer\Naming\IdenticalPropertyNamingStrategy;
 use JMS\Serializer\SerializerBuilder;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Silex service provider which registers metagist api clients.
@@ -229,6 +230,26 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
         );
         $resolver = new Validation\SchemaResolver($config);
         return new Validation\Plugin\SchemaValidator($resolver);
+    }
+    
+    /**
+     * Returns a request instance containing the incoming data.
+     * 
+     * @link http://stackoverflow.com/questions/11990388/request-headers-bag-is-missing-authorization-header-in-symfony-2
+     * @return \Symfony\Component\HttpFoundation\Request
+     */
+    public function getIncomingRequest()
+    {
+        $request = Request::createFromGlobals();
+        
+        if (!$request->headers->has('Authorization') && function_exists('apache_request_headers')) {
+            $all = apache_request_headers();
+            if (isset($all['Authorization'])) {
+                $request->headers->set('Authorization', $all['Authorization']);
+            }
+        }
+        
+        return $request;
     }
 
     public function boot(Application $app)

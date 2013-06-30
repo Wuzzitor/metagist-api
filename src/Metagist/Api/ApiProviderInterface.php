@@ -47,4 +47,11 @@ interface ApiProviderInterface
      * @return \Metagist\Api\Validation\Plugin\SchemaValidator
      */
     public function getSchemaValidator();
+    
+    /**
+     * Returns a request instance containing the incoming data.
+     * 
+     * @return \Symfony\Component\HttpFoundation\Request
+     */
+    public function getIncomingRequest();
 }
