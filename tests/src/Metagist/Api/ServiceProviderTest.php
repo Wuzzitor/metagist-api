@@ -194,5 +194,13 @@ class ServiceProviderTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException(null);
         $this->serviceProvider->validateRequest($message);
     }
-    
+ 
+    /**
+     * Ensures a JMS serializer is returned
+     */
+    public function testGetSerializer()
+    {
+        $serializer = $this->serviceProvider->getSerializer();
+        $this->assertInstanceOf("\JMS\Serializer\SerializerInterface", $serializer);
+    }
 }

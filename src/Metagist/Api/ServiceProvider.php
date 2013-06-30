@@ -5,6 +5,8 @@ use Silex\Application;
 use Silex\ServiceProviderInterface;
 use Guzzle\Service\Builder\ServiceBuilder;
 use Guzzle\Service\Description\ServiceDescription;
+use JMS\Serializer\Naming\IdenticalPropertyNamingStrategy;
+use JMS\Serializer\SerializerBuilder;
 
 /**
  * Silex service provider which registers metagist api clients.
@@ -111,15 +113,34 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
         $client->setDescription(
             ServiceDescription::factory($this->getDefaultDescription($name))
         );
+        
+        /*
+         * add plugin for twolegged oauth 
+         */
         $plugin = new \Guzzle\Plugin\Oauth\OauthPlugin($config);
         $client->addSubscriber($plugin);
         
+        /*
+         * add logger plugin
+         */
         if (isset($this->app[self::APP_MONOLOG]) && $this->app[self::APP_MONOLOG] instanceof \Monolog\Logger) {
             $plugin = new \Guzzle\Plugin\Log\LogPlugin(
                 new \Guzzle\Log\MonologLogAdapter($this->app[self::APP_MONOLOG])
             );
             $client->addSubscriber($plugin);
         }
+        
+        /*
+         * add json schema validation plugin
+         */
+        $config = array(
+            'scan' => null,
+            'package'  => __DIR__ . '/../../../services/package.schema.json',
+            'pushInfo' => __DIR__ . '/../../../services/pushInfo.schema.json'
+        );
+        $resolver = new Validation\SchemaResolver($config);
+        $schemaValidator = new Validation\Plugin\SchemaValidator($resolver);
+        $client->addSubscriber($schemaValidator);
         
         return $client;
     }
@@ -185,12 +206,15 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
     /**
      * Returns a serializer instance.
      * 
-     * @todo might need configuration
+     * @return \JMS\Serializer\SerializerInterface
      * @todo might be replaced by guzzle features
      */
     public function getSerializer()
     {
-        return \JMS\Serializer\SerializerBuilder::create()->build();
+        $builder = SerializerBuilder::create();
+        $builder->setPropertyNamingStrategy(new IdenticalPropertyNamingStrategy());
+        $serializer = $builder->build();
+        return $serializer;
     }
 
     public function boot(Application $app)
