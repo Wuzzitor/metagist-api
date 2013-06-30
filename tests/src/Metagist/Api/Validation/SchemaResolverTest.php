@@ -23,7 +23,7 @@ class SchemaResolverTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         parent::setUp();
-        $pushInfo = __DIR__ . '/../../../../../services/api.pushInfo.schema.json';
+        $pushInfo = __DIR__ . '/../../../../../services/api.pushInfo.json';
         
         $this->resolver = new SchemaResolver(
             array(
