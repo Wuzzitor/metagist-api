@@ -113,12 +113,13 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
         $client->setDescription(
             ServiceDescription::factory($this->getDefaultDescription($name))
         );
+        $eventDispatcher = $client->getEventDispatcher();
         
         /*
          * add plugin for twolegged oauth 
          */
         $plugin = new \Guzzle\Plugin\Oauth\OauthPlugin($config);
-        $client->addSubscriber($plugin);
+        $eventDispatcher->addSubscriber($plugin);
         
         /*
          * add logger plugin
@@ -127,13 +128,14 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
             $plugin = new \Guzzle\Plugin\Log\LogPlugin(
                 new \Guzzle\Log\MonologLogAdapter($this->app[self::APP_MONOLOG])
             );
-            $client->addSubscriber($plugin);
+            $eventDispatcher->addSubscriber($plugin);
         }
+        
         
         /*
          * add json schema validation plugin
          */
-        $client->addSubscriber($this->getSchemaValidator());
+        $eventDispatcher->addSubscriber($this->getSchemaValidator());
         
         return $client;
     }
