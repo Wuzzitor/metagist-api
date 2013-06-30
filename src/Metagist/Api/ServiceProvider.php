@@ -220,9 +220,12 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
     public function getSchemaValidator()
     {
         $config = array(
-            'scan' => null,
-            'package'  => __DIR__ . '/../../../services/api.package.json',
-            'pushInfo' => __DIR__ . '/../../../services/api.pushInfo.json'
+            'basepath' => __DIR__ . '/../../../services/',
+            'mapping'  => array(
+                'scan' => null,
+                'package'  => __DIR__ . '/../../../services/api.package.json',
+                'pushInfo' => __DIR__ . '/../../../services/api.pushInfo.json'
+            )
         );
         $resolver = new Validation\SchemaResolver($config);
         return new Validation\Plugin\SchemaValidator($resolver);

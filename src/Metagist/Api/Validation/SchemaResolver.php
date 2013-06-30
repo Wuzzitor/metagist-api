@@ -29,6 +29,10 @@ class SchemaResolver
      */
     public function __construct(array $config)
     {
+        if (!array_key_exists('mapping', $config)) {
+            throw new \InvalidArgumentException('Schema mapping not configured');
+        }
+        
         $this->config = $config;
     }
     
