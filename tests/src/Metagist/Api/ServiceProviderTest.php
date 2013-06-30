@@ -203,4 +203,13 @@ class ServiceProviderTest extends \PHPUnit_Framework_TestCase
         $serializer = $this->serviceProvider->getSerializer();
         $this->assertInstanceOf("\JMS\Serializer\SerializerInterface", $serializer);
     }
+    
+    /**
+     * Ensures the service provider returns a schema validator
+     */
+    public function testGetSchemaValidator()
+    {
+        $validator = $this->serviceProvider->getSchemaValidator();
+        $this->assertInstanceOf("\Metagist\Api\Validation\Plugin\SchemaValidator", $validator);
+    }
 }

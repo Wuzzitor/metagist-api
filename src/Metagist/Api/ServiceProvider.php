@@ -133,14 +133,7 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
         /*
          * add json schema validation plugin
          */
-        $config = array(
-            'scan' => null,
-            'package'  => __DIR__ . '/../../../services/package.schema.json',
-            'pushInfo' => __DIR__ . '/../../../services/pushInfo.schema.json'
-        );
-        $resolver = new Validation\SchemaResolver($config);
-        $schemaValidator = new Validation\Plugin\SchemaValidator($resolver);
-        $client->addSubscriber($schemaValidator);
+        $client->addSubscriber($this->getSchemaValidator());
         
         return $client;
     }
@@ -215,6 +208,22 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
         $builder->setPropertyNamingStrategy(new IdenticalPropertyNamingStrategy());
         $serializer = $builder->build();
         return $serializer;
+    }
+    
+    /**
+     * Returns a schema validator instance.
+     * 
+     * @return \Metagist\Api\Validation\Plugin\SchemaValidator
+     */
+    public function getSchemaValidator()
+    {
+        $config = array(
+            'scan' => null,
+            'package'  => __DIR__ . '/../../../services/api.package.json',
+            'pushInfo' => __DIR__ . '/../../../services/api.pushInfo.json'
+        );
+        $resolver = new Validation\SchemaResolver($config);
+        return new Validation\Plugin\SchemaValidator($resolver);
     }
 
     public function boot(Application $app)

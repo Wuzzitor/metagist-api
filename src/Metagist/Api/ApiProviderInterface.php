@@ -40,4 +40,11 @@ interface ApiProviderInterface
      * @return \JMS\Serializer\SerializerInterface
      */
     public function getSerializer();
+    
+    /**
+     * Returns a schema validator instance.
+     * 
+     * @return \Metagist\Api\Validation\Plugin\SchemaValidator
+     */
+    public function getSchemaValidator();
 }
