@@ -245,7 +245,11 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
         if (!$request->headers->has('Authorization') && function_exists('apache_request_headers')) {
             $all = apache_request_headers();
             if (isset($all['Authorization'])) {
-                $request->headers->set('Authorization', $all['Authorization']);
+                $authHeader = $all['Authorization'];
+                if (strpos($authHeader, 'OAuth ') === false) {
+                    $authHeader = 'OAuth ' . $authHeader;
+                }
+                $request->headers->set('Authorization', $authHeader);
             }
         }
         
