@@ -53,7 +53,7 @@ interface ApiProviderInterface
     /**
      * Returns a request instance containing the incoming data.
      * 
-     * @return \Symfony\Component\HttpFoundation\Request
+     * @return \Guzzle\Http\Message\RequestInterface
      */
     public function getIncomingRequest();
 }
