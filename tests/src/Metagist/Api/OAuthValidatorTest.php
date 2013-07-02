@@ -18,11 +18,21 @@ class OAuthValidatorTest extends \PHPUnit_Framework_TestCase
     private $validator;
     
     /**
+     * service provider
+     * 
+     * @var \Metagist\Api\ServiceProvider
+     */
+    private $serviceProvider;
+    
+    /**
      * Test setup.
      */
     public function setUp()
     {
         parent::setUp();
+        
+        $this->serviceProvider = new ServiceProvider();
+        
         $this->validator = new \Metagist\Api\OAuthValidator(
             array(
                 'allowedConsumer' => 'allowedSecret',
@@ -53,10 +63,10 @@ class OAuthValidatorTest extends \PHPUnit_Framework_TestCase
         $params    = $this->validator->getAuthorizationParams($request);
         $signature = $params['oauth_signature'];
         $message   = str_replace($signature, 'fake-sig', $message);
+        $request   = $this->serviceProvider->getIncomingRequest($message);
         
         $this->setExpectedException("\Metagist\Api\Exception", 'Signature mismatch');
-        
-        $this->validator->validateRequest($message);
+        $this->validator->validateRequest($request);
     }
     
     /**
@@ -65,9 +75,10 @@ class OAuthValidatorTest extends \PHPUnit_Framework_TestCase
     public function testFailsForWrongTimestamp()
     {
         $message = $this->createRequest('allowedConsumer', 'allowedSecret', time() - 1000);
+        $request = $this->serviceProvider->getIncomingRequest($message);
         
         $this->setExpectedException("\Metagist\Api\Exception", 'Timestamp');
-        $this->validator->validateRequest($message);
+        $this->validator->validateRequest($request);
     }
     
     /**
@@ -108,6 +119,8 @@ Authorization: OAuth oauth_consumer_key="worker", oauth_nonce="e2436c4f9fbb23b52
             $messageProvider->setFakeTimestamp($timestamp);
         }
         
-        return $messageProvider->getMessage($consumer, $secret);
+        $message = $messageProvider->getMessage($consumer, $secret);
+        
+        return $this->serviceProvider->getIncomingRequest($message);
     }
 }
