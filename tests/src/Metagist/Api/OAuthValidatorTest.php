@@ -24,7 +24,10 @@ class OAuthValidatorTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
         $this->validator = new \Metagist\Api\OAuthValidator(
-            array('allowedConsumer' => 'allowedSecret')
+            array(
+                'allowedConsumer' => 'allowedSecret',
+                'worker' => 'dev-master',
+            )
         );
     }
     
@@ -65,6 +68,29 @@ class OAuthValidatorTest extends \PHPUnit_Framework_TestCase
         
         $this->setExpectedException("\Metagist\Api\Exception", 'Timestamp');
         $this->validator->validateRequest($message);
+    }
+    
+    /**
+     * This is a real incoming request.
+     */
+    public function testValidateRealRequest()
+    {
+        $_SERVER['HTTPS'] = 'on';
+        
+        //$this->markTestIncomplete('request is not valid');
+        $message = 'POST /api/pushInfo/matthimatiker/molcomponents HTTP/1.1
+Host: metagist.dev
+User-Agent: Guzzle/3.7.0 curl/7.22.0 PHP/5.3.10-1ubuntu3.6
+Content-Length: 119
+Content-Type: application/json
+Authorization: OAuth oauth_consumer_key="worker", oauth_nonce="e2436c4f9fbb23b52978cb5ef1a6a84bc55c6cdd", oauth_signature="qSko7f2aZxWiZOPoo3Q8SaHAOB0%3D", oauth_signature_method="HMAC-SHA1", oauth_timestamp="1372711591", oauth_version="1.0"
+
+{"info":{"group":"repository","version":"dev-master","value":"https:\/\/github.com\/Matthimatiker\/MolComponents.git"}}';
+        
+        $serviceProvider = new ServiceProvider();
+        $request = $serviceProvider->getIncomingRequest($message);
+        
+        $this->validator->validateRequest($request);
     }
     
     /**

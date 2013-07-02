@@ -1,10 +1,12 @@
 <?php
 namespace Metagist\Api;
 
+use Guzzle\Http\Message\Request;
+
 /**
  * Validates incoming OAuth requests.
  * 
- * Uses the Guzzl OAuth plugin to re-calculate signature hashes of requests.
+ * Uses the Guzzle OAuth plugin to re-calculate signature hashes of requests.
  * 
  * @author Daniel Pozzi <bonndan76@googlemail.com>
  * @link http://code.google.com/p/oauth-php/wiki/ServerHowTo
@@ -46,13 +48,11 @@ class OAuthValidator
     /**
      * Two-legged oauth request validation.
      * 
-     * @param string $message
+     * @param \Guzzle\Http\Message\Request $message
      * @throws Exception
      */
-    public function validateRequest($message)
+    public function validateRequest(Request $request)
     {
-        $factory          = new \Guzzle\Http\Message\RequestFactory();
-        $request          = $factory->fromMessage($message);
         $this->authParams = $this->getAuthorizationParams($request);
         
         $consumerKey = $this->getConsumerKey();
@@ -67,7 +67,6 @@ class OAuthValidator
                 'consumer_secret' => $secret
             )
         );
-        
         $signature = $plugin->getSignature(
             $request,
             $this->getTimestamp(),
@@ -75,7 +74,7 @@ class OAuthValidator
         );
         
         if ($signature != $this->getSignature()) {
-            throw new Exception('Signature mismatch.', 401);
+            throw new Exception('Signature mismatch: computed ' . $signature . ', received ' . $this->getSignature(), 401);
         }
         
         $now = time();
