@@ -190,9 +190,10 @@ class ServiceProviderTest extends \PHPUnit_Framework_TestCase
         
         $messageProvider = new \Metagist\Api\Test\MessageProvider();
         $message         = $messageProvider->getMessage('worker1', 'test');
+        $request = $this->serviceProvider->getIncomingRequest($message);
         
         $this->setExpectedException(null);
-        $this->serviceProvider->validateRequest($message);
+        $this->serviceProvider->validateRequest($request);
     }
  
     /**

@@ -1,6 +1,8 @@
 <?php
 namespace Metagist\Api;
 
+use Guzzle\Http\Message\RequestInterface;
+
 /**
  * Interface for the API Provider
  * 
@@ -28,11 +30,11 @@ interface ApiProviderInterface
      * Validates an incoming two-legged oauth request and returns the consumer
      * key on success.
      * 
-     * @param string $message
+     * @param \Guzzle\Http\Message\RequestInterface $request
      * @return string
      * @throws \Metagist\Api\Exception if the request is not valid.
      */
-    public function validateRequest($message);
+    public function validateRequest(RequestInterface $request);
     
     /**
      * Returns a (de)serializer to handle json payloads.

@@ -5,9 +5,9 @@ use Silex\Application;
 use Silex\ServiceProviderInterface;
 use Guzzle\Service\Builder\ServiceBuilder;
 use Guzzle\Service\Description\ServiceDescription;
+use Guzzle\Http\Message\RequestInterface;
 use JMS\Serializer\Naming\IdenticalPropertyNamingStrategy;
 use JMS\Serializer\SerializerBuilder;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Silex service provider which registers metagist api clients.
@@ -185,17 +185,17 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
     /**
      * Performs two-legged oauth validation.
      * 
-     * @param string $message raw incoming message.
+     * @param RequestInterface $message raw incoming message.
      * @return string the consumer key of the sender.
      */
-    public function validateRequest($message)
+    public function validateRequest(RequestInterface $request)
     {
         if (!isset($this->app[self::APP_CONSUMERS])) {
             throw new Exception('Service consumers are not configured.', 500);
         }
         
         $validator = new OAuthValidator($this->app[self::APP_CONSUMERS]);
-        $validator->validateRequest($message);
+        $validator->validateRequest($request);
         return $validator->getConsumerKey();
     }
     
@@ -236,7 +236,7 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
      * Returns a request instance containing the incoming data.
      * 
      * @link http://stackoverflow.com/questions/11990388/request-headers-bag-is-missing-authorization-header-in-symfony-2
-     * @return \Guzzle\Http\Message\Request
+     * @return \Guzzle\Http\Message\RequestInterface
      * @todo Symfony Request is used to get request as string, can maybe be replaced by Guzzle
      */
     public function getIncomingRequest($message = null)
@@ -263,7 +263,7 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
      */
     protected function getIncomingRequestMessage()
     {
-        $request = Request::createFromGlobals();
+        $request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
         
         //add authorization header
         if (!$request->headers->has('Authorization') && function_exists('apache_request_headers')) {
