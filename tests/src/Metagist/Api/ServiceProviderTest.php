@@ -219,7 +219,8 @@ class ServiceProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetIncomingRequest()
     {
         $_POST['test'] = 'test';
+        $_SERVER['HTTPS'] = 'on';
         $request = $this->serviceProvider->getIncomingRequest();
-        $this->assertInstanceOf("\Symfony\Component\HttpFoundation\Request", $request);
+        $this->assertInstanceOf("\Guzzle\Http\Message\Request", $request);
     }
 }

@@ -236,12 +236,36 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
      * Returns a request instance containing the incoming data.
      * 
      * @link http://stackoverflow.com/questions/11990388/request-headers-bag-is-missing-authorization-header-in-symfony-2
-     * @return \Symfony\Component\HttpFoundation\Request
+     * @return \Guzzle\Http\Message\Request
+     * @todo Symfony Request is used to get request as string, can maybe be replaced by Guzzle
      */
-    public function getIncomingRequest()
+    public function getIncomingRequest($message = null)
+    {
+        if ($message === null) {
+            $message = $this->getIncomingRequestMessage();
+        }
+        
+        $factory = new \Guzzle\Http\Message\RequestFactory();
+        $request = $factory->fromMessage($message);
+        
+        //fix missing https in url
+        $url = $request->getUrl();
+        if (isset($_SERVER['HTTPS']) && strpos($url, 'https') === false) {
+            $request->setUrl(str_replace('http', 'https', $url));
+        }
+        return $request;
+    }
+    
+    /**
+     * Recreates the incoming request message, returns it as plain text.
+     * 
+     * @return string
+     */
+    protected function getIncomingRequestMessage()
     {
         $request = Request::createFromGlobals();
         
+        //add authorization header
         if (!$request->headers->has('Authorization') && function_exists('apache_request_headers')) {
             $all = apache_request_headers();
             if (isset($all['Authorization'])) {
@@ -253,7 +277,7 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
             }
         }
         
-        return $request;
+        return $request->__toString();
     }
 
     public function boot(Application $app)
