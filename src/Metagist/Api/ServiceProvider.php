@@ -292,7 +292,7 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
             // define the authentication provider object
             $app['security.authentication_provider.' . $name . '.api'] = $app->share(function () use ($app) {
                 return new PreAuthenticatedAuthenticationProvider(
-                    new UserProvider($app[Api\ServiceProvider::APP_CONSUMERS]),
+                    new UserProvider($app[ServiceProvider::APP_CONSUMERS]),
                     new UserChecker(),
                     'api'
                 );
