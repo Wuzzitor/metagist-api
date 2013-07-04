@@ -293,7 +293,7 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
             $app['security.authentication_provider.' . $name . '.api'] = $app->share(function () use ($app) {
                 return new PreAuthenticatedAuthenticationProvider(
                     new UserProvider($app[ServiceProvider::APP_CONSUMERS]),
-                    new UserChecker(),
+                    new \Symfony\Component\Security\Core\User\UserChecker(),
                     'api'
                 );
             });
