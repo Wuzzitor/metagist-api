@@ -1,4 +1,5 @@
 <?php
+
 namespace Metagist\Api;
 
 use Silex\Application;
@@ -23,49 +24,49 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
      * @var string
      */
     const API = 'metagist.api';
-    
+
     /**
      * App key under which the services config is registered.
      * 
      * @var string
      */
     const APP_SERVICES = 'metagist.services';
-    
+
     /**
      * App key under which the service consumers are registered.
      * 
      * @var string
      */
     const APP_CONSUMERS = 'metagist.consumers';
-    
+
     /**
      * App key under which the worker config is registered.
      * 
      * @var string
      */
     const APP_WORKER_CONFIG = 'metagist.worker.config';
-    
+
     /**
      * App key under which the server config is registered.
      * 
      * @var string
      */
     const APP_SERVER_CONFIG = 'metagist.server.config';
-    
+
     /**
      * Key where a monolog instance must be present to enable logging.
      * 
      * @var string
      */
     const APP_MONOLOG = 'monolog';
-    
+
     /**
      * app instance.
      * 
      * @var \Silex\Application
      */
     protected $app;
-    
+
     /**
      * Register Guzzle with Silex
      *
@@ -76,8 +77,9 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
         $this->app = $app;
 
         $this->registerApiCallback($app);
+        $this->registerApiAuthenticationListener($app);
     }
-    
+
     /**
      * Registers itself under "metagist.api".
      * 
@@ -88,10 +90,10 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
     {
         $that = $this;
         $app[self::API] = $app->share(function () use ($that) {
-            return $that;
-        });
+                return $that;
+            });
     }
-    
+
     /**
      * Returns a guzzle service client instance.
      * 
@@ -104,24 +106,24 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
         if (!array_key_exists('consumer_key', $config)) {
             throw new Exception('OAuth consumer key not configured', 500);
         }
-        
+
         if (!array_key_exists('consumer_secret', $config)) {
             throw new Exception('OAuth consumer secret not configured', 500);
         }
-        
+
         $builder = ServiceBuilder::factory($this->app[self::APP_SERVICES]);
-        $client  = $builder->get($name, $config);
+        $client = $builder->get($name, $config);
         $client->setDescription(
             ServiceDescription::factory($this->getDefaultDescription($name))
         );
         $eventDispatcher = $client->getEventDispatcher();
-        
+
         /*
          * add plugin for twolegged oauth 
          */
         $plugin = new \Guzzle\Plugin\Oauth\OauthPlugin($config);
         $eventDispatcher->addSubscriber($plugin);
-        
+
         /*
          * add logger plugin
          */
@@ -131,16 +133,16 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
             );
             $eventDispatcher->addSubscriber($plugin);
         }
-        
-        
+
+
         /*
          * add json schema validation plugin
          */
         $eventDispatcher->addSubscriber($this->getSchemaValidator());
-        
+
         return $client;
     }
-    
+
     /**
      * Returns the path to the default json service description.
      * 
@@ -151,7 +153,7 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
     {
         return realpath(__DIR__ . '/../../../services/' . $name . '.json');
     }
-    
+
     /**
      *  Provides a worker client.
      * 
@@ -163,10 +165,10 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
         if (!isset($this->app[self::APP_WORKER_CONFIG])) {
             throw new Exception('Worker is not configured.', 500);
         }
-        
+
         return $this->buildService('Worker', $this->app[self::APP_WORKER_CONFIG]);
     }
-    
+
     /**
      * Provides a server client.
      * 
@@ -178,10 +180,10 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
         if (!isset($this->app[self::APP_SERVER_CONFIG])) {
             throw new Exception('Server is not configured.', 500);
         }
-        
+
         return $this->buildService('Server', $this->app[self::APP_SERVER_CONFIG]);
     }
-    
+
     /**
      * Performs two-legged oauth validation.
      * 
@@ -193,12 +195,11 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
         if (!isset($this->app[self::APP_CONSUMERS])) {
             throw new Exception('Service consumers are not configured.', 500);
         }
-        
-        $validator = new OAuthValidator($this->app[self::APP_CONSUMERS]);
-        $validator->validateRequest($request);
-        return $validator->getConsumerKey();
+        $dispatcher = $this->app['dispatcher']; /* @var $dispatcher Symfony\Component\EventDispatcher\EventDispatcherInterface */
+        $event = new \Symfony\Component\EventDispatcher\GenericEvent($request);
+        $dispatcher->dispatch(AuthenticationListener::EVENT_INCOMING_REQUEST, $event);
     }
-    
+
     /**
      * Returns a serializer instance.
      * 
@@ -212,7 +213,7 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
         $serializer = $builder->build();
         return $serializer;
     }
-    
+
     /**
      * Returns a schema validator instance.
      * 
@@ -222,16 +223,16 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
     {
         $config = array(
             'basepath' => __DIR__ . '/../../../services/',
-            'mapping'  => array(
+            'mapping' => array(
                 'scan' => null,
-                'package'  => __DIR__ . '/../../../services/api.package.json',
+                'package' => __DIR__ . '/../../../services/api.package.json',
                 'pushInfo' => __DIR__ . '/../../../services/api.pushInfo.json'
             )
         );
         $resolver = new Validation\SchemaResolver($config);
         return new Validation\Plugin\SchemaValidator($resolver);
     }
-    
+
     /**
      * Returns a request instance containing the incoming data.
      * 
@@ -244,10 +245,10 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
         if ($message === null) {
             $message = $this->getIncomingRequestMessage();
         }
-        
+
         $factory = new \Guzzle\Http\Message\RequestFactory();
         $request = $factory->fromMessage($message);
-        
+
         //fix missing https in url
         $url = $request->getUrl();
         if (isset($_SERVER['HTTPS']) && strpos($url, 'https') === false) {
@@ -255,7 +256,7 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
         }
         return $request;
     }
-    
+
     /**
      * Recreates the incoming request message, returns it as plain text.
      * 
@@ -264,7 +265,7 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
     protected function getIncomingRequestMessage()
     {
         $request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
-        
+
         //add authorization header
         if (!$request->headers->has('Authorization') && function_exists('apache_request_headers')) {
             $all = apache_request_headers();
@@ -276,11 +277,56 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
                 $request->headers->set('Authorization', $authHeader);
             }
         }
-        
+
         return $request->__toString();
+    }
+
+    /**
+     * Registers an authentication listener for api-based authentication.
+     * 
+     * @param \Silex\Application $app
+     */
+    protected function registerApiAuthenticationListener(Application $app)
+    {
+        $app['security.authentication_listener.factory.api'] = $app->protect(function ($name, $options) use ($app) {
+            // define the authentication provider object
+            $app['security.authentication_provider.' . $name . '.api'] = $app->share(function () use ($app) {
+                $consumers = $this->application[Api\ServiceProvider::APP_CONSUMERS];
+                $users = array();
+                foreach (array_keys($consumers) as $consumer) {
+                    $users[$consumer] = array('enabled' => true);
+                }
+                $inMemoryProvider = new \Symfony\Component\Security\Core\User\InMemoryUserProvider($users);
+                return new PreAuthenticatedAuthenticationProvider(
+                    $inMemoryProvider,
+                    new UserChecker(),
+                    'api'
+                );
+            });
+
+            // define the authentication listener object
+            $app['security.authentication_listener.' . $name . '.api'] = $app->share(function () use ($app) {
+                return new AuthenticationListener(
+                    $app['security'], $app['security.authentication_manager'], $app['monolog']
+                );
+            });
+
+            return array(
+                // the authentication provider id
+                'security.authentication_provider.' . $name . '.api',
+                // the authentication listener id
+                'security.authentication_listener.' . $name . '.api',
+                // the entry point id
+                null,
+                // the position of the listener in the stack
+                'pre_auth'
+            );
+        });
     }
 
     public function boot(Application $app)
     {
+        
     }
+
 }

@@ -224,4 +224,34 @@ class ServiceProviderTest extends \PHPUnit_Framework_TestCase
         $request = $this->serviceProvider->getIncomingRequest();
         $this->assertInstanceOf("\Guzzle\Http\Message\Request", $request);
     }
+    
+    /**
+     * Ensures that the validateRequest() method triggers an event.
+     */
+    public function testValidateRequest()
+    {
+        $this->app[ServiceProvider::APP_CONSUMERS] = array('test' => 'test');
+        $request = $this->getMock("\Guzzle\Http\Message\RequestInterface");
+        $dispatcher = $this->getMock("\Symfony\Component\EventDispatcher\EventDispatcherInterface");
+        $dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(AuthenticationListener::EVENT_INCOMING_REQUEST, $this->isInstanceOf("\Symfony\Component\EventDispatcher\GenericEvent"));
+        
+        $this->app['dispatcher'] = $dispatcher;
+        $this->serviceProvider->register($this->app);
+        
+        $this->setExpectedException(null);
+        $this->serviceProvider->validateRequest($request);
+    }
+    
+    /**
+     * Ensures that an exception is thrown if no consumers are configured.
+     */
+    public function testValidateRequestEnforcesConfiguration()
+    {
+        unset($this->app[ServiceProvider::APP_CONSUMERS]);
+        $request = $this->getMock("\Guzzle\Http\Message\RequestInterface");
+        $this->setExpectedException("\Metagist\Api\Exception");
+        $this->serviceProvider->validateRequest($request);
+    }
 }
