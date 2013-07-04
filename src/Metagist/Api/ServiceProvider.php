@@ -300,12 +300,14 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
 
             // define the authentication listener object
             $app['security.authentication_listener.' . $name . '.api'] = $app->share(function () use ($app) {
-                return new AuthenticationListener(
+                $subscriber = new AuthenticationListener(
                     $app['security'],
                     $app['security.authentication_manager'],
                     new OAuthValidator($app[ServiceProvider::APP_CONSUMERS]),
                     $app['monolog']
                 );
+                $app['dispatcher']->addSubscriber($subscriber);
+                return $subscriber;
             });
 
             return array(
