@@ -9,6 +9,7 @@ use Guzzle\Service\Description\ServiceDescription;
 use Guzzle\Http\Message\RequestInterface;
 use JMS\Serializer\Naming\IdenticalPropertyNamingStrategy;
 use JMS\Serializer\SerializerBuilder;
+use Symfony\Component\Security\Core\Authentication\Provider\PreAuthenticatedAuthenticationProvider;
 
 /**
  * Silex service provider which registers metagist api clients.
@@ -290,14 +291,8 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
         $app['security.authentication_listener.factory.api'] = $app->protect(function ($name, $options) use ($app) {
             // define the authentication provider object
             $app['security.authentication_provider.' . $name . '.api'] = $app->share(function () use ($app) {
-                $consumers = $this->application[Api\ServiceProvider::APP_CONSUMERS];
-                $users = array();
-                foreach (array_keys($consumers) as $consumer) {
-                    $users[$consumer] = array('enabled' => true);
-                }
-                $inMemoryProvider = new \Symfony\Component\Security\Core\User\InMemoryUserProvider($users);
                 return new PreAuthenticatedAuthenticationProvider(
-                    $inMemoryProvider,
+                    new UserProvider($app[Api\ServiceProvider::APP_CONSUMERS]),
                     new UserChecker(),
                     'api'
                 );
@@ -321,6 +316,17 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
                 'pre_auth'
             );
         });
+        
+        //enable the api firewall for the /api path in requests
+        if (isset($app['security.firewalls'])) {
+            $firewalls = $app['security.firewalls'];
+            $firewalls['api'] = array(
+                'pattern' => '^/api',
+                'api' => true,
+                'opauth' => false,
+            );
+            $app['security.firewalls'] = $firewalls;
+        }
     }
 
     public function boot(Application $app)

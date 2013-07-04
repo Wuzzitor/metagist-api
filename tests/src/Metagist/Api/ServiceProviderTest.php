@@ -254,4 +254,14 @@ class ServiceProviderTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException("\Metagist\Api\Exception");
         $this->serviceProvider->validateRequest($request);
     }
+    
+    /**
+     * Ensures that the /api request path is protected using the api firewall.
+     */
+    public function testRegisteredAuthListenerFactory()
+    {
+        $this->app['security.firewalls'] = array();
+        $this->serviceProvider->register($this->app);
+        $this->assertArrayHasKey('api', $this->app['security.firewalls']);
+    }
 }
