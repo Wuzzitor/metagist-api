@@ -53,7 +53,11 @@ class ServerClient extends Client implements ServerInterface
         if ($serializer instanceof \Guzzle\Service\Command\DefaultRequestSerializer) {
             $serializer->addVisitor('body', $this->getRequestVisitor());
         }
-        return $command->execute();
+        try {
+            return $command->execute();
+        } catch (\Metagist\Api\Validation\Exception $exception) {
+            return $exception;
+        }
     }
 
     /**
