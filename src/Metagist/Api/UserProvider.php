@@ -62,11 +62,14 @@ class UserProvider implements UserProviderInterface
     /**
      * Loads a user.
      * 
-     * @param string $username
+     * @param string|\Metagist\User $username
      * @return \Metagist\User
      */
     public function loadUserByUsername($username)
     {
+        if ($username instanceof \Metagist\User) {
+            $username = $username->getUsername();
+        }
         $this->assertExists($username);
         $user = new \Metagist\User($username, \Metagist\User::ROLE_SYSTEM);
         return $user;
@@ -84,7 +87,7 @@ class UserProvider implements UserProviderInterface
         return $user;
     }
     
-    /**
+/**
      * Ensures that the username is registered as api consumer.
      * 
      * @param string $username
@@ -93,7 +96,9 @@ class UserProvider implements UserProviderInterface
     protected function assertExists($username)
     {
         if (!array_key_exists($username, $this->consumers)) {
-            throw new UnsupportedUserException('Unknown user ' . $username);
+            throw new UnsupportedUserException(
+                'Unknown consumer "' . $username . '". Registered consumers: ' . implode(',', array_keys($this->consumers))
+            );
         }
     }
 }
