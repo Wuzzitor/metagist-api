@@ -188,7 +188,6 @@ class ServiceProvider implements ServiceProviderInterface, ApiProviderInterface
      * Performs two-legged oauth validation.
      * 
      * @param RequestInterface $message raw incoming message.
-     * @return string the consumer key of the sender.
      */
     public function validateRequest(RequestInterface $request)
     {

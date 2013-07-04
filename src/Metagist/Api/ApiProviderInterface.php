@@ -31,7 +31,6 @@ interface ApiProviderInterface
      * key on success.
      * 
      * @param \Guzzle\Http\Message\RequestInterface $request
-     * @return string
      * @throws \Metagist\Api\Exception if the request is not valid.
      */
     public function validateRequest(RequestInterface $request);
