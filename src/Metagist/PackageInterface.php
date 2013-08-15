@@ -63,7 +63,7 @@ interface PackageInterface
      * @param string $group
      * @return \Doctrine\Common\Collections\Collection|null
      */
-    public function getMetaInfos($group = null);
+    public function getMetainfos($group = null);
     
     /**
      * Returns the time of the last update

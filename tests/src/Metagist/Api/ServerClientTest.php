@@ -64,7 +64,7 @@ class ServerClientTest extends \PHPUnit_Framework_TestCase
         $package = $this->client->package('author', 'name');
         $this->assertInstanceOf("\Metagist\Package", $package);
         $this->assertEquals('bonndan/test', $package->getIdentifier());
-        $this->assertNotEmpty($package->getMetaInfos());
+        $this->assertNotEmpty($package->getMetainfos());
     }
     
     /**
@@ -90,8 +90,8 @@ class ServerClientTest extends \PHPUnit_Framework_TestCase
         $package = new \Metagist\Package('bonndan/test');
         
         $collection = new \Doctrine\Common\Collections\ArrayCollection();
-        $collection->add(\Metagist\MetaInfo::fromValue('testInteger', 1));
-        $package->setMetaInfos($collection);
+        $collection->add(\Metagist\Metainfo::fromValue('testInteger', 1));
+        $package->setMetainfos($collection);
         return $package;
     }
     
@@ -104,7 +104,7 @@ class ServerClientTest extends \PHPUnit_Framework_TestCase
         $plugin->addResponse(new \Guzzle\Http\Message\Response(200));
         $this->client->addSubscriber($plugin);
         
-        $info = \Metagist\MetaInfo::fromValue('test', 'avalue', '1.0.0');
+        $info = \Metagist\Metainfo::fromValue('test', 'avalue', '1.0.0');
         $this->client->pushInfo('author', 'name', $info);
         
         

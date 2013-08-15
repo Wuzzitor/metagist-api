@@ -42,9 +42,9 @@ class PackageResponse implements ResponseClassInterface
         
         $collection = new \Doctrine\Common\Collections\ArrayCollection();
         foreach ($metainfos as $data) {
-            $collection->add(\Metagist\MetaInfo::fromArray($data));
+            $collection->add(\Metagist\Metainfo::fromArray($data));
         }
-        $package->setMetaInfos($collection);
+        $package->setMetainfos($collection);
         return new PackageResponse($package);
     }
 

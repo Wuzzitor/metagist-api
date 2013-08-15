@@ -121,7 +121,7 @@ class MessageProvider implements EventSubscriberInterface
         $server->addSubscriber($this);
         
         try {
-            $server->pushInfo('author', 'name', \Metagist\MetaInfo::fromValue('testInteger', 1, '0.1.1'));
+            $server->pushInfo('author', 'name', \Metagist\Metainfo::fromValue('testInteger', 1, '0.1.1'));
         } catch (\Guzzle\Http\Exception\ClientErrorResponseException $exception) {
             /*
              * do nothing.

@@ -1,6 +1,6 @@
 <?php
 /**
- * MetaInfointerface.php
+ * Metainfointerface.php
  * 
  * @package metagist-api
  * @author Daniel Pozzi <bonndan76@googlemail.com>

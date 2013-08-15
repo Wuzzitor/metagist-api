@@ -23,9 +23,9 @@ interface ServerInterface
      * 
      * @param string             $author
      * @param string             $name
-     * @param \Metagist\MetaInfo $info = null
+     * @param \Metagist\Metainfo $info = null
      * @return mixed
      * @throws \Metagist\Api\Exception
      */
-    public function pushInfo($author, $name, \Metagist\MetaInfo $info = null);
+    public function pushInfo($author, $name, \Metagist\Metainfo $info = null);
 }

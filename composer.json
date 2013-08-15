@@ -20,29 +20,12 @@
     },
     "require-dev": {
         "silex/silex"           : "1.0.*@dev",
-        "wuzzitor/metagist.org" : "dev-master",
         "doctrine/common"       : "2.3.0",
         "symfony/security"      : "~2.2"
     },
     "autoload": {
         "psr-0": {
-            "Metagist\\Api\\Guzzle\\Plugin"     : "src/",
-            "Metagist\\Api"     : "src/",
-            "Metagist"          : "vendor/wuzzitor/metagist.org/src"
+            "Metagist"     : "src/"
         }
-    },
-    "repositories": [
-        { 
-            "type": "package",
-            "package": {
-                "name": "wuzzitor/metagist.org",
-                "version": "dev-master",
-                "source": {
-                    "url": "https://github.com/Wuzzitor/metagist.org.git",
-                    "type": "git",
-                    "reference": "0.1.6"
-                }
-            }
-        }
-    ]
+    }
 }

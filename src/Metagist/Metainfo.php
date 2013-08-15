@@ -1,12 +1,19 @@
 <?php
+/**
+ * Metainfo.php
+ * 
+ * @author Daniel Pozzi <bonndan76@googlemail.com>
+ * @package metagist-api
+ */
 namespace Metagist;
 
 /**
- * Class representing info on a package.
+ * Metainfo value object.
  * 
  * @author Daniel Pozzi <bonndan76@googlemail.com>
+ * @package metagist-api
  */
-class MetaInfo
+class Metainfo implements MetainfoInterface
 {
     /**
      * identifier for the repo
@@ -120,7 +127,7 @@ class MetaInfo
      * Factory method.
      * 
      * @param array $data
-     * @return MetaInfo
+     * @return Metainfo
      */
     public static function fromArray(array $data)
     {
@@ -140,7 +147,7 @@ class MetaInfo
      * 
      * @param string $group
      * @param mixed  $value
-     * @return MetaInfo
+     * @return Metainfo
      */
     public static function fromValue($group, $value, $version = null)
     {
