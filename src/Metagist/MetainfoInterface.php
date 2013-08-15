@@ -7,8 +7,6 @@
  */
 namespace Metagist;
 
-use Metagist\PackageInterface;
-
 /**
  * Interface for metainfos.
  * 
@@ -18,13 +16,6 @@ use Metagist\PackageInterface;
 interface MetainfoInterface
 {
     /**
-     * Set the related package.
-     * 
-     * @param \Metagist\PackageInterface $package
-     */
-    public function setPackage(PackageInterface $package);
-    
-    /**
      * Returns the related package.
      * 
      * @return \Metagist\PackageInterface|null
@@ -32,25 +23,11 @@ interface MetainfoInterface
     public function getPackage();
     
     /**
-     * Set the group name.
-     * 
-     * @param string
-     */
-    public function setGroup($group);
-    
-    /**
      * Returns the group name.
      * 
      * @return string
      */
     public function getGroup();
-    
-    /**
-     * Set the value.
-     * 
-     * @param string|int|float|boolean $value
-     */
-    public function setValue($value);
     
     /**
      * Returns the value.
@@ -65,13 +42,6 @@ interface MetainfoInterface
      * @return string|null
      */
     public function getVersion();
-    
-    /**
-     * Set the version string.
-     * 
-     * @param string $version
-     */
-    public function setVersion($version);
     
     /**
      * Returns the time of the last update
