@@ -284,20 +284,6 @@ class Factory implements FactoryInterface
     }
 
     /**
-     * Returns a request validator instance.
-     * 
-     * @return RequestValidator
-     */
-    public function getRequestValidator()
-    {
-        if (!isset($this->config['dispatcher'])) {
-            throw new Exception('Dispatcher instance not available in config.');
-        }
-        
-        return new RequestValidator($this->config['dispatcher']);
-    }
-    
-    /**
      * Recreates the incoming request message, returns it as plain text.
      * 
      * @return string

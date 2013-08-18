@@ -60,12 +60,15 @@ class ServiceProvider extends Factory implements ServiceProviderInterface
     /**
      * Dispatcher an oauth request validation event.
      * 
-     * 
      * @param \Guzzle\Http\Message\RequestInterface $request
      */
     public function validateRequest(RequestInterface $request)
     {
-        $validator = $this->getRequestValidator();
+        if (!isset($this->config['dispatcher'])) {
+            throw new Exception('Dispatcher instance not available in config.');
+        }
+        
+        $validator = new RequestValidator($this->config['dispatcher']);
         $validator->validateRequest($request);
     }
     

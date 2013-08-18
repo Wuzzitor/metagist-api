@@ -188,18 +188,4 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf("\Guzzle\Http\Message\Request", $request);
     }
     
-    public function testGetRequestValidator()
-    {
-        $this->factory->setConfig(
-            array('dispatcher' => $dispatcher = $this->getMock("\Symfony\Component\EventDispatcher\EventDispatcherInterface"))
-        );
-        $validator = $this->factory->getRequestValidator();
-        $this->assertInstanceOf("\Metagist\Api\RequestValidator", $validator);
-    }
-    
-    public function testGetRequestValidatorException()
-    {
-        $this->setExpectedException("\Metagist\Api\Exception");
-        $this->factory->getRequestValidator();
-    }
 }

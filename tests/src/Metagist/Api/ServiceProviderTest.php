@@ -110,6 +110,17 @@ class ServiceProviderTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
+     * Ensures an exception is thrown if the dispatcher is not present.
+     */
+    public function testValidateRequestNoDispatcherException()
+    {
+        unset($this->app['dispatcher']);
+        $request = $this->getMock("\Guzzle\Http\Message\RequestInterface");
+        $this->setExpectedException("\Metagist\Api\Exception", "Dispatcher instance not available");
+        $this->serviceProvider->validateRequest($request);
+    }
+    
+    /**
      * Ensures that the /api request path is protected using the api firewall.
      */
     public function testRegisteredAuthListenerFactory()

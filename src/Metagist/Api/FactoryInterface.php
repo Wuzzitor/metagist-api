@@ -25,13 +25,6 @@ interface FactoryInterface
     public function getServerClient();
     
     /**
-     * Returns the request validator.
-     * 
-     * @return RequestValidator
-     */
-    public function getRequestValidator();
-    
-    /**
      * Returns a (de)serializer to handle json payloads.
      * 
      * @return \JMS\Serializer\SerializerInterface
