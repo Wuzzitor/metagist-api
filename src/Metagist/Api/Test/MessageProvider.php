@@ -22,10 +22,11 @@ class MessageProvider implements EventSubscriberInterface
     private $serviceProvider;
     
     /**
-     * app
-     * @var \Silex\Application
+     * configuration array
+     * 
+     * @var array
      */
-    private $app;
+    private $config;
     
     /**
      * the request message
@@ -48,21 +49,20 @@ class MessageProvider implements EventSubscriberInterface
     public function __construct()
     {
         $this->serviceProvider = new ServiceProvider();
-        $this->app = new \Silex\Application();
         
-        $this->app[ServiceProvider::APP_SERVICES] = realpath(__DIR__ . '/../../../../services/testservices.json');
-        $this->app[ServiceProvider::APP_CONSUMERS] = array(
+        $this->config[ServiceProvider::APP_SERVICES] = realpath(__DIR__ . '/../../../../services/testservices.json');
+        $this->config[ServiceProvider::APP_CONSUMERS] = array(
             self::CONSUMER_KEY => 'test'
         );
-        $this->app[ServiceProvider::APP_WORKER_CONFIG] = array(
+        $this->config[ServiceProvider::APP_WORKER_CONFIG] = array(
             'base_url' => 'http://localhost',
             'description' => realpath(__DIR__ . '/../../../../services/Worker.json'),
         );
-        $this->app[ServiceProvider::APP_SERVER_CONFIG] = array(
+        $this->config[ServiceProvider::APP_SERVER_CONFIG] = array(
             'base_url' => 'http://localhost',
             'description' => realpath(__DIR__ . '/../../../../services/Server.json'),
         );
-        $this->serviceProvider->register($this->app);
+        $this->serviceProvider->setConfig($this->config);
     }
     
     /**
@@ -95,12 +95,12 @@ class MessageProvider implements EventSubscriberInterface
      */
     protected function getWorker($consumerKey = self::CONSUMER_KEY, $consumerSecret = self::CONSUMER_SECRET)
     {
-        $config = $this->app[ServiceProvider::APP_WORKER_CONFIG];
-        $config['consumer_key'] = $consumerKey;
-        $config['consumer_secret'] = $consumerSecret;
-        $this->app[ServiceProvider::APP_WORKER_CONFIG]= $config;
+        $config[ServiceProvider::APP_WORKER_CONFIG] = $this->config[ServiceProvider::APP_WORKER_CONFIG];
+        $config[ServiceProvider::APP_WORKER_CONFIG]['consumer_key'] = $consumerKey;
+        $config[ServiceProvider::APP_WORKER_CONFIG]['consumer_secret'] = $consumerSecret;
+        $this->serviceProvider->setConfig($config);
         
-        $worker = $this->serviceProvider->worker();
+        $worker = $this->serviceProvider->getWorkerClient();
         
         return $worker;
     }
@@ -112,12 +112,12 @@ class MessageProvider implements EventSubscriberInterface
      */
     public function getPushInfoMessage()
     {
-        $config = $this->app[ServiceProvider::APP_SERVER_CONFIG];
-        $config['consumer_key'] = self::CONSUMER_KEY;
-        $config['consumer_secret'] = self::CONSUMER_SECRET;
-        $this->app[ServiceProvider::APP_SERVER_CONFIG]= $config;
+        $config[ServiceProvider::APP_SERVER_CONFIG] = $this->config[ServiceProvider::APP_SERVER_CONFIG];
+        $config[ServiceProvider::APP_SERVER_CONFIG]['consumer_key'] = self::CONSUMER_KEY;
+        $config[ServiceProvider::APP_SERVER_CONFIG]['consumer_secret'] = self::CONSUMER_SECRET;
+        $this->serviceProvider->setConfig($config);
         
-        $server = $this->serviceProvider->server();
+        $server = $this->serviceProvider->getServerClient();
         $server->addSubscriber($this);
         
         try {

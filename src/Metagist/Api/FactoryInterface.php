@@ -1,39 +1,35 @@
 <?php
 namespace Metagist\Api;
 
-use Guzzle\Http\Message\RequestInterface;
-
 /**
- * Interface for the API Provider
+ * Interface for the API Factory
  * 
  * @author Daniel Pozzi <bonndan76@googlemail.com>
  */
-interface ApiProviderInterface
+interface FactoryInterface
 {
     /**
-     * Returns the worker api.
+     * Returns the client for the worker api.
      * 
      * @return \Metagist\Api\WorkerInterface
      * @throws \Metagist\Api\Exception on misconfiguration
      */
-    public function worker();
+    public function getWorkerClient();
     
     /**
-     * Returns the server api.
+     * Returns the client for the server api.
      * 
      * @return \Metagist\Api\ServerInterface
      * @throws \Metagist\Api\Exception on misconfiguration
      */
-    public function server();
+    public function getServerClient();
     
     /**
-     * Validates an incoming two-legged oauth request and returns the consumer
-     * key on success.
+     * Returns the request validator.
      * 
-     * @param \Guzzle\Http\Message\RequestInterface $request
-     * @throws \Metagist\Api\Exception if the request is not valid.
+     * @return RequestValidator
      */
-    public function validateRequest(RequestInterface $request);
+    public function getRequestValidator();
     
     /**
      * Returns a (de)serializer to handle json payloads.

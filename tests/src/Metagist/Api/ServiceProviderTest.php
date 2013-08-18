@@ -30,6 +30,11 @@ class ServiceProviderTest extends \PHPUnit_Framework_TestCase
         parent::setUp();
         $this->serviceProvider = new \Metagist\Api\ServiceProvider();
         $this->app = new \Silex\Application();
+        $this->app[ServiceProvider::APP_CONSUMERS] = array(
+            'worker1' => 'test'
+        );
+        $dispatcher = $this->getMock("\Symfony\Component\EventDispatcher\EventDispatcherInterface");
+        $this->app['dispatcher'] = $dispatcher;
     }
     
     /**
@@ -37,139 +42,13 @@ class ServiceProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testRegistersApiCallback()
     {
+        $this->app[ServiceProvider::APP_SERVICES] = __DIR__ . '/testdata/testservices.json';
+        
         $this->serviceProvider->register($this->app);
         $api = $this->app[ServiceProvider::API];
         $this->assertEquals($this->serviceProvider, $api);
     }
     
-    /**
-     * Ensures the server() method returns an ServerInterface implementation.
-     */
-    public function testApiProvidesServerInterface()
-    {
-        $this->app[ServiceProvider::APP_SERVICES] = __DIR__ . '/testdata/testservices.json';
-        $this->app[ServiceProvider::APP_SERVER_CONFIG] = array(
-            'base_url' => 'http://test.com',
-            'description' => realpath(__DIR__ . '/../../../../services/Server.json'),
-            'consumer_key' => 'metagist.org',
-            'consumer_secret' => 'obey'
-        );
-        $this->serviceProvider->register($this->app);
-        
-        $server = $this->serviceProvider->server();
-        $this->assertInstanceOf("\Metagist\Api\ServerInterface", $server);
-        $this->assertInstanceOf("\Metagist\Api\ServerClient", $server);
-    }
-    
-    /**
-     * Ensures an exception is thrown if the server client is requested but not
-     * configured.
-     */
-    public function testApiNoServerInterfaceException()
-    {
-        $this->serviceProvider->register($this->app);
-        $this->setExpectedException("\Metagist\Api\Exception");
-        $this->serviceProvider->server();
-    }
-    
-    /**
-     * Ensures the worker() method returns an WorkerInterface implementation.
-     */
-    public function testApiProvidesWorkerInterface()
-    {
-        $this->app[ServiceProvider::APP_SERVICES] = __DIR__ . '/testdata/testservices.json';
-        $this->app[ServiceProvider::APP_WORKER_CONFIG] = array(
-            'base_url' => 'http://test.com',
-            'description' => realpath(__DIR__ . '/../../../../services/Worker.json'),
-            'consumer_key' => 'worker1',
-            'consumer_secret' => 'test'
-        );
-        $this->serviceProvider->register($this->app);
-        
-        $worker = $this->serviceProvider->worker();
-        $this->assertInstanceOf("\Metagist\Api\WorkerInterface", $worker);
-        $this->assertInstanceOf("\Metagist\Api\WorkerClient", $worker);
-    }
-    
-    /**
-     * Ensures an exception is thrown if the worker client is requested but not
-     * configured.
-     */
-    public function testApiNoWorkerInterfaceException()
-    {
-        $this->serviceProvider->register($this->app);
-        $this->setExpectedException("\Metagist\Api\Exception");
-        $this->serviceProvider->worker();
-    }
-    
-    /**
-     * Ensures an exception is thrown if the oauth configuration is missing.
-     */
-    public function testApiNoOauthConfigurationException()
-    {
-        $this->app[ServiceProvider::APP_SERVICES] = __DIR__ . '/testdata/testservices.json';
-        $this->app[ServiceProvider::APP_WORKER_CONFIG] = array(
-            'base_url' => 'http://test.com',
-            'description' => realpath(__DIR__ . '/../../../../services/Server.json'),
-        );
-        $this->serviceProvider->register($this->app);
-        
-        $this->setExpectedException("\Metagist\Api\Exception", 'OAuth');
-        $this->serviceProvider->worker();
-    }
-    
-    /**
-     * Ensures a log plugin is listening if a logger is available.
-     */
-    public function testServiceProviderAddsMonologPlugin()
-    {
-        $this->app['monolog'] = new \Monolog\Logger('test');
-        $this->app[ServiceProvider::APP_SERVICES] = __DIR__ . '/testdata/testservices.json';
-        $this->app[ServiceProvider::APP_WORKER_CONFIG] = array(
-            'base_url' => 'http://test.com',
-            'description' => realpath(__DIR__ . '/../../../../services/Worker.json'),
-            'consumer_key' => 'worker1',
-            'consumer_secret' => 'test'
-        );
-        $this->serviceProvider->register($this->app);
-        
-        $worker = $this->serviceProvider->worker();
-        /* @var $worker \Guzzle\Service\Client */
-        $listeners = $worker->getEventDispatcher()->getListeners('request.before_send');
-        foreach ($listeners as $data) {
-            if ($data[0] instanceof \Guzzle\Plugin\Log\LogPlugin) {
-                return;
-            }
-        }
-        
-        $this->fail('No log plugin found.');
-    }
-    
-    /**
-     * Ensures that an oauth plugin is listening.
-     */
-    public function testServiceProviderAddsOauthPlugin()
-    {
-        $this->app[ServiceProvider::APP_SERVICES] = __DIR__ . '/testdata/testservices.json';
-        $this->app[ServiceProvider::APP_WORKER_CONFIG] = array(
-            'base_url' => 'http://test.com',
-            'description' => realpath(__DIR__ . '/../../../../services/Worker.json'),
-            'consumer_key' => 'worker1',
-            'consumer_secret' => 'test'
-        );
-        $this->serviceProvider->register($this->app);
-        
-        $worker = $this->serviceProvider->worker();
-        /* @var $worker \Guzzle\Service\Client */
-        $listeners = $worker->getEventDispatcher()->getListeners('request.before_send');
-        foreach ($listeners as $data) {
-            if ($data[0] instanceof \Guzzle\Plugin\Oauth\OauthPlugin) {
-                return;
-            }
-        }
-        
-        $this->fail('No oauth plugin found.');
-    }
     
     /**
      * Ensures the whole oath integration works. 
@@ -186,6 +65,8 @@ class ServiceProviderTest extends \PHPUnit_Framework_TestCase
             'consumer_key' => 'worker1',
             'consumer_secret' => 'test'
         );
+        
+        
         $this->serviceProvider->register($this->app);
         
         $messageProvider = new \Metagist\Api\Test\MessageProvider();
@@ -195,35 +76,6 @@ class ServiceProviderTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException(null);
         $this->serviceProvider->validateRequest($request);
     }
- 
-    /**
-     * Ensures a JMS serializer is returned
-     */
-    public function testGetSerializer()
-    {
-        $serializer = $this->serviceProvider->getSerializer();
-        $this->assertInstanceOf("\JMS\Serializer\SerializerInterface", $serializer);
-    }
-    
-    /**
-     * Ensures the service provider returns a schema validator
-     */
-    public function testGetSchemaValidator()
-    {
-        $validator = $this->serviceProvider->getSchemaValidator();
-        $this->assertInstanceOf("\Metagist\Api\Validation\Plugin\SchemaValidator", $validator);
-    }
-    
-    /**
-     * Ensures the incoming request is returned as object
-     */
-    public function testGetIncomingRequest()
-    {
-        $_POST['test'] = 'test';
-        $_SERVER['HTTPS'] = 'on';
-        $request = $this->serviceProvider->getIncomingRequest();
-        $this->assertInstanceOf("\Guzzle\Http\Message\Request", $request);
-    }
     
     /**
      * Ensures that the validateRequest() method triggers an event.
@@ -231,6 +83,8 @@ class ServiceProviderTest extends \PHPUnit_Framework_TestCase
     public function testValidateRequest()
     {
         $this->app[ServiceProvider::APP_CONSUMERS] = array('test' => 'test');
+        $this->app[ServiceProvider::APP_SERVICES] = __DIR__ . '/testdata/testservices.json';
+        
         $request = $this->getMock("\Guzzle\Http\Message\RequestInterface");
         $dispatcher = $this->getMock("\Symfony\Component\EventDispatcher\EventDispatcherInterface");
         $dispatcher->expects($this->once())
@@ -260,6 +114,7 @@ class ServiceProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testRegisteredAuthListenerFactory()
     {
+        $this->app[ServiceProvider::APP_SERVICES] = __DIR__ . '/testdata/testservices.json';
         $this->app['security.firewalls'] = array();
         $this->serviceProvider->register($this->app);
         $this->assertArrayHasKey('api', $this->app['security.firewalls']);
