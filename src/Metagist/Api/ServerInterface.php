@@ -1,6 +1,8 @@
 <?php
 namespace Metagist\Api;
 
+use Metagist\MetainfoInterface;
+
 /**
  * Interface for the Metagist server (metagist.org).
  * 
@@ -21,11 +23,11 @@ interface ServerInterface
     /**
      * Pushes metainfo to the server.
      * 
-     * @param string             $author
-     * @param string             $name
-     * @param \Metagist\Metainfo $info = null
+     * @param string            $author
+     * @param string            $name
+     * @param MetainfoInterface $info = null
      * @return mixed
      * @throws \Metagist\Api\Exception
      */
-    public function pushInfo($author, $name, \Metagist\Metainfo $info = null);
+    public function pushInfo($author, $name, MetainfoInterface $info = null);
 }

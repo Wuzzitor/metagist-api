@@ -1,6 +1,7 @@
 <?php
 namespace Metagist\Api;
 
+use Metagist\MetainfoInterface;
 use Guzzle\Service\Client;
 
 /**
@@ -39,7 +40,7 @@ class ServerClient extends Client implements ServerInterface
      * @param \Metagist\Metainfo $info = null
      * @return mixed
      */
-    public function pushInfo($author, $name, \Metagist\Metainfo $info = null)
+    public function pushInfo($author, $name, MetainfoInterface $info = null)
     {
         $args = array(
             'author' => $author,
