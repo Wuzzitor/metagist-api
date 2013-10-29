@@ -49,7 +49,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
             array('test123', true),
             array('test-123', true),
             array('test-123-TEST', true),
-            array('test-12.3', false),
+            array('test-12.3', true),
             array('t', false),
             array('1', false),
             array('test/123', false),
@@ -195,7 +195,6 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
             array('a/b'),
             array('/b'),
             array('a/'),
-            array('has_/underscore'),
             array('is/' . str_repeat('toolong', 30)),
         );
     }
